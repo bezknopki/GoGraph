@@ -89,24 +89,28 @@ namespace GoGraph.ViewElements
         private List<Polyline>? CreateArrows()
         {
             List<Polyline> arrows = new List<Polyline>();
-            ArrowBuilder arrowBuilder = new ArrowBuilder();
+            Arrow arrow = new Arrow();
 
             switch (_direction)
             {
                 case Direction.FirstToSecond:
-                    {                       
-                        arrows.Add(arrowBuilder.SetPoints(_p1, _p2).Build());
+                    {
+                        arrow.SetPoints(_p1, _p2);
+                        arrows.Add(arrow.GetArrowView());
                         break;
                     }
                 case Direction.SecondToFirst:
                     {
-                        arrows.Add(arrowBuilder.SetPoints(_p2, _p1).Build());
+                        arrow.SetPoints(_p2, _p1);
+                        arrows.Add(arrow.GetArrowView());
                         break;
                     }
                 case Direction.Both:
                     {
-                        arrows.Add(arrowBuilder.SetPoints(_p1, _p2).Build());
-                        arrows.Add(arrowBuilder.SetPoints(_p2, _p1).Build());
+                        arrow.SetPoints(_p1, _p2);
+                        arrows.Add(arrow.GetArrowView());
+                        arrow.SetPoints(_p2, _p1);
+                        arrows.Add(arrow.GetArrowView());
                         break;
                     }
                 default: return null;
