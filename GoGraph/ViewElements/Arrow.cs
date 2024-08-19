@@ -27,7 +27,7 @@ namespace GoGraph.ViewElements
 
         public Polyline GetArrowView()
         {
-            (Point first, Point second) = CalcPoints();
+            (Point first, Point second) = CalcArrowPoints();
 
             Polyline arrow = new Polyline
             {
@@ -44,7 +44,7 @@ namespace GoGraph.ViewElements
 
         public void Redraw(Polyline arrow)
         {
-            (Point first, Point second) = CalcPoints();
+            (Point first, Point second) = CalcArrowPoints();
 
             arrow.Points.Clear();
             arrow.Points.Add(first);
@@ -52,7 +52,7 @@ namespace GoGraph.ViewElements
             arrow.Points.Add(second);
         }
 
-        private (Point, Point) CalcPoints()
+        private (Point, Point) CalcArrowPoints()
         {
             int quarterNum = MathTool.GetQuarterNum(startPoint, arrowPoint);
 

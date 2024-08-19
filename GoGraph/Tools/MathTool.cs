@@ -9,15 +9,15 @@ namespace GoGraph.Tools
 {
     public static class MathTool
     {
+        const double radius = 26;
+
         public static int GetQuarterNum(Point from, Point to)
             => from.X < to.X
             ? from.Y < to.Y ? 3 : 2
             : from.Y >= to.Y ? 1 : 4;
 
         public static Point CalcPointWithOffset(Node from, Node to)
-        {
-            Point point;
-
+        {            
             double x1 = from.View.Node.Margin.Left + from.View.Node.Width / 2;
             double x2 = to.View.Node.Margin.Left + to.View.Node.Width / 2;
             double y1 = from.View.Node.Margin.Top + from.View.Node.Height / 2;
@@ -32,13 +32,10 @@ namespace GoGraph.Tools
             int quarterNum = GetQuarterNum(pFrom, pTo);
 
             int sign = quarterNum > 2 ? -1 : 1;
-            double radius = 26;
 
             (double sinBeta, double cosBeta) = Math.SinCos(Math.Acos(cosAlpha) * sign + Math.PI);
 
-            point = new Point(x1 + radius * cosBeta, y1 + radius * sinBeta);
-
-            return point;
+            return new Point(x1 + radius * cosBeta, y1 + radius * sinBeta);
         }
     }
 }

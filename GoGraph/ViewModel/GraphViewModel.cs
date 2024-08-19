@@ -17,28 +17,46 @@ using GoGraph.Tools;
 using GoGraph.Graph.Nodes;
 using GoGraph.Graph.Edges;
 using System.Xml.Linq;
+using GoGraph.Graph.GraphCreator;
 
 namespace GoGraph.ViewModel
 {
     public class GraphViewModel : INotifyPropertyChanged
     {
+        private GraphCreator _creator = new SimpleGraphCreator();
         private RelayCommand _addNodeCommand;
+        private RelayCommand _createGraphCommand;
         private GraphModel _model = new GraphModel();
 
         private Node? firstSelected;
         private Node? secondSelected;
 
+        public RelayCommand CreateGrapghCommand 
+        {
+            get 
+            {
+                return _createGraphCommand ??= new RelayCommand(obj => CreateGraph(obj));
+            }
+            set { _createGraphCommand = value; } 
+        }
+
         public RelayCommand AddNodeCommand
         {
             get
             {
-                return _addNodeCommand ??= new RelayCommand(obj => AddOrSelectNode(obj), obj => obj is Grid);
+                return _addNodeCommand ??= new RelayCommand(obj => AddOrSelectNode(obj), obj => obj is Grid && _model.Graph != null);
             }
             set { _addNodeCommand = value; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+
+        private void CreateGraph(object obj)
+        {
+            var type = (GraphTypes)obj;
+            _model.Graph = _creator.Create(type);
+        }
 
         private void AddOrSelectNode(object obj)
         {
@@ -71,6 +89,13 @@ namespace GoGraph.ViewModel
                     foreach (var line in edgeView.Arrows)
                         grid.Children.Add(line);
 
+                    Edge edge = new DirectedEdge();
+                    edge.First = firstSelected; 
+                    edge.Second = secondSelected;
+                    edge.View = edgeView;
+                    //TODO: appropriate edge creating
+                    _model.Graph.Edges.Add(edge);
+
                     UnselectNode(firstSelected);
                     UnselectNode(secondSelected);
                 }
@@ -94,14 +119,14 @@ namespace GoGraph.ViewModel
                 Name = name,
                 View = view
             };
-            _model.Nodes.Add(newNode);
+            _model.Graph.Nodes.Add(newNode);
         }
 
         private (bool, Node?) IsMouseOverNode(Grid grid)
         {
             Point curPos = Mouse.GetPosition(grid);
 
-            foreach (var node in _model.Nodes)
+            foreach (var node in _model.Graph.Nodes)
                 if (curPos.X > node.View.Node.Margin.Left && curPos.X < node.View.Node.Margin.Left + node.View.Node.Width)
                     if (curPos.Y > node.View.Node.Margin.Top && curPos.Y < node.View.Node.Margin.Top + node.View.Node.Height)
                         return (true, node);

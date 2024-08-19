@@ -3,11 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:GoGraph"
+        xmlns:local="clr-namespace:GoGraph" xmlns:gt="clr-namespace:GoGraph.Graph.GraphCreator"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="20"></RowDefinition>
             <RowDefinition Height="4*"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
@@ -15,10 +16,23 @@
             <ColumnDefinition Width="4*"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Grid Name="grid" Grid.Row="0" Grid.Column="0" Background="LightCyan">
+        <Grid Name="grid" Grid.Row="1" Grid.Column="0" Background="LightCyan">
             <Grid.InputBindings>
                 <MouseBinding MouseAction="LeftClick" Command="{Binding AddNodeCommand}" CommandParameter="{Binding ElementName=grid}"/>
             </Grid.InputBindings>
         </Grid>
+        <Menu Height ="20" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0">
+            <MenuItem Header="File">
+                <MenuItem Header="New Project">
+                    <MenuItem Header="Simple Graph" Command="{Binding CreateGrapghCommand}" CommandParameter="{x:Static gt:GraphTypes.Simple}"/>
+                    <MenuItem Header="Weightened Graph" Command="{Binding CreateGrapghCommand}" CommandParameter="{x:Static gt:GraphTypes.Weightened}"/>
+                    <MenuItem Header="Directed Graph" Command="{Binding CreateGrapghCommand}" CommandParameter="{x:Static gt:GraphTypes.Directed}"/>
+                    <MenuItem Header="Directed Weightened Graph" Command="{Binding CreateGrapghCommand}" CommandParameter="{x:Static gt:GraphTypes.DirectedWeightened}"/>
+                </MenuItem>
+                <MenuItem Header="Open Project"/>
+                <MenuItem Header="Save"/>
+                <MenuItem Header="Save As..."/>
+            </MenuItem>
+        </Menu>
     </Grid>
 </Window>

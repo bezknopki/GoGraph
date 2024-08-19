@@ -5,12 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using GoGraph.Graph.Nodes;
 using GoGraph.Graph.Edges;
+using GoGraph.Graph.Graphs;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace GoGraph.Model
 {
-    public class GraphModel
+    public class GraphModel : INotifyPropertyChanged
     {
-        public List<Node> Nodes { get; set; } = new List<Node>();
-        public List<Edge> Edges { get; set; } = new List<Edge>();
+        public GraphBase? Graph { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string prop = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
     }
 }
