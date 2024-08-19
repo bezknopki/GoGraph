@@ -1,4 +1,5 @@
 ﻿using GoGraph.Graph.Nodes;
+using GoGraph.ViewElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +17,12 @@ namespace GoGraph.Tools
             ? from.Y < to.Y ? 3 : 2
             : from.Y >= to.Y ? 1 : 4;
 
-        public static Point CalcPointWithOffset(Node from, Node to)
+        public static Point CalcPointWithOffset(NodeView from, NodeView to)
         {            
-            double x1 = from.View.Node.Margin.Left + from.View.Node.Width / 2;
-            double x2 = to.View.Node.Margin.Left + to.View.Node.Width / 2;
-            double y1 = from.View.Node.Margin.Top + from.View.Node.Height / 2;
-            double y2 = to.View.Node.Margin.Top + to.View.Node.Height / 2;
+            double x1 = from.Node.Margin.Left + from.Node.Width / 2;
+            double x2 = to.Node.Margin.Left + to.Node.Width / 2;
+            double y1 = from.Node.Margin.Top + from.Node.Height / 2;
+            double y2 = to.Node.Margin.Top + to.Node.Height / 2;
 
             Point pFrom = new Point(x1, y1);
             Point pTo = new Point(x2, y2);

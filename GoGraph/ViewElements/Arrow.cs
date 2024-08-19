@@ -29,11 +29,7 @@ namespace GoGraph.ViewElements
         {
             (Point first, Point second) = CalcArrowPoints();
 
-            Polyline arrow = new Polyline
-            {
-                Stroke = Brushes.Black,
-                StrokeThickness = 3
-            };
+            Polyline arrow = ViewElementsCreator.CreateArrowEmtyPolyline();
 
             arrow.Points.Add(first);
             arrow.Points.Add(arrowPoint);

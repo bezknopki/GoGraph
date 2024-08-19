@@ -4,5 +4,7 @@
     {
         private static int _current;
         public static int Next { get { return _current++; } }
+
+        public static void SetStart(int start) => _current = ++start;
     }
 }

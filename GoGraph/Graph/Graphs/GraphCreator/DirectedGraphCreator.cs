@@ -1,6 +1,4 @@
-﻿using GoGraph.Graph.Graphs;
-
-namespace GoGraph.Graph.GraphCreator
+﻿namespace GoGraph.Graph.Graphs.GraphCreator
 {
     public class DirectedGraphCreator : GraphCreator
     {

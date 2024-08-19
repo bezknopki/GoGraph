@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace GoGraph.Graph.Graphs
 {
+    [Serializable]
     public abstract class GraphBase
     {
         public readonly bool IsWeightened;

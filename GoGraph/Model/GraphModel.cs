@@ -8,12 +8,20 @@ using GoGraph.Graph.Edges;
 using GoGraph.Graph.Graphs;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Net;
+using System.Text.Json.Serialization;
+using System.Windows.Shapes;
+using GoGraph.ViewElements;
 
 namespace GoGraph.Model
 {
+    [Serializable]
     public class GraphModel : INotifyPropertyChanged
     {
         public GraphBase? Graph { get; set; }
+
+        public Dictionary<Edge, EdgeView> EdgeViews = new Dictionary<Edge, EdgeView>();
+        public Dictionary<NodeView, Node> NodeViews = new Dictionary<NodeView, Node>();
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));

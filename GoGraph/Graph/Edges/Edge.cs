@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 
 namespace GoGraph.Graph.Edges
 {
-    public abstract class Edge
+    [Serializable]
+    public class Edge
     {
-        public EdgeView View { get; set; }
         public Node? First { get; set; }
         public Node? Second { get; set; }
         public bool IsWeightened { get; set; }
+        public bool IsDirected { get; set; }
+        public Direction Direction { get; set; }
         public double Weight { get; set; }
     }
 }

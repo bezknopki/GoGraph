@@ -12,8 +12,7 @@ using System.Windows.Controls;
 namespace GoGraph.ViewElements
 {
     public class EdgeViewBuilder
-    {
-        const int weightBlockSide = 30;
+    {        
         const int radius = 30;
 
         private Point _p1;
@@ -45,78 +44,16 @@ namespace GoGraph.ViewElements
         public EdgeView Build()
             => new EdgeView
             {
-                Edge = CreateEdgeLine(),
+                Edge = ViewElementsCreator.CreateEdgeLine(_p1, _p2),
                 Weight = CreateWeightTextBlock(),
-                Arrows = CreateArrows()
-            };
-
-        private Line CreateEdgeLine()
-            => new Line
-            {
-                X1 = _p1.X,
-                Y1 = _p1.Y,
-                X2 = _p2.X,
-                Y2 = _p2.Y,
-                Stroke = Brushes.Black,
-                StrokeThickness = 3
+                Arrows = ViewElementsCreator.CreateArrows(_direction, _p1, _p2)
             };
 
         private TextBlock CreateWeightTextBlock()
         {
             if (!_isWeightened) return null;
 
-            Point center = new Point
-            {
-                X = Math.Abs((_p1.X - _p2.X) / 2) + Math.Min(_p1.X, _p2.X),
-                Y = Math.Abs((_p1.Y - _p2.Y) / 2) + Math.Min(_p1.Y, _p2.Y)
-            };
-
-            TextBlock weightTextBlock = new TextBlock
-            {
-                Text = _weight.ToString(),
-                Height = weightBlockSide,
-                Width = weightBlockSide,
-                FontSize = 20,
-                TextAlignment = TextAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(center.X, center.Y, 0, 0)
-            };
-
-            return weightTextBlock;
-        }
-
-        private List<Polyline>? CreateArrows()
-        {
-            List<Polyline> arrows = new List<Polyline>();
-            Arrow arrow = new Arrow();
-
-            switch (_direction)
-            {
-                case Direction.FirstToSecond:
-                    {
-                        arrow.SetPoints(_p1, _p2);
-                        arrows.Add(arrow.GetArrowView());
-                        break;
-                    }
-                case Direction.SecondToFirst:
-                    {
-                        arrow.SetPoints(_p2, _p1);
-                        arrows.Add(arrow.GetArrowView());
-                        break;
-                    }
-                case Direction.Both:
-                    {
-                        arrow.SetPoints(_p1, _p2);
-                        arrows.Add(arrow.GetArrowView());
-                        arrow.SetPoints(_p2, _p1);
-                        arrows.Add(arrow.GetArrowView());
-                        break;
-                    }
-                default: return null;
-            }
-
-            return arrows;
-        }       
+            return ViewElementsCreator.CreateWeightTextBlock(_p1, _p2, _weight);
+        }     
     }
 }

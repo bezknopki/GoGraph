@@ -1,4 +1,4 @@
-﻿namespace GoGraph.Graph.GraphCreator
+﻿namespace GoGraph.Graph.Graphs.GraphCreator
 {
     public enum GraphTypes
     {

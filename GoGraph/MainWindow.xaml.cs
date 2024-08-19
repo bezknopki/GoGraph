@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -17,10 +18,15 @@ namespace GoGraph
     /// </summary>
     public partial class MainWindow : Window
     {
+        Regex isNumbersOnly = new Regex("[^0-9]+");
+
         public MainWindow()
         {
             InitializeComponent();
             DataContext = new GraphViewModel();
         }
+
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e) => e.Handled = isNumbersOnly.IsMatch(e.Text);
+        
     }
 }

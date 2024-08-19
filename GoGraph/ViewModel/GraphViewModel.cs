@@ -17,52 +17,158 @@ using GoGraph.Tools;
 using GoGraph.Graph.Nodes;
 using GoGraph.Graph.Edges;
 using System.Xml.Linq;
-using GoGraph.Graph.GraphCreator;
+using GoGraph.Graph.Graphs.GraphCreator;
+using System.Printing;
+using GoGraph.Serializer;
 
 namespace GoGraph.ViewModel
 {
     public class GraphViewModel : INotifyPropertyChanged
     {
-        private GraphCreator _creator = new SimpleGraphCreator();
-        private RelayCommand _addNodeCommand;
-        private RelayCommand _createGraphCommand;
         private GraphModel _model = new GraphModel();
 
-        private Node? firstSelected;
-        private Node? secondSelected;
+        private GraphCreator _creator = new SimpleGraphCreator();
 
-        public RelayCommand CreateGrapghCommand 
+        private RelayCommand _addNodeCommand;
+        private RelayCommand _createGraphCommand;
+        private RelayCommand _openCommand;
+        private RelayCommand _saveCommand;
+        private RelayCommand _saveAsCommand;
+
+        private List<Direction> _directions = new List<Direction> { Direction.FirstToSecond, Direction.SecondToFirst, Direction.Both };
+
+        private Direction _selectedDirection = Direction.FirstToSecond;
+
+        private string _weight = "0";
+        private string _savePath = string.Empty;
+        
+        private NodeView? _firstSelected;
+        private NodeView? _secondSelected;
+
+        public List<Direction> Directions => _directions;
+
+        public bool IsDirected => _model.Graph != null && _model.Graph.IsDirected;
+        public bool IsWeightened => _model.Graph != null && _model.Graph.IsWeightened;
+        public bool IsSaveAvailable => !string.IsNullOrEmpty(_savePath);
+        public bool IsSaveAsAvailable => _model.Graph != null;
+
+        public string Weight
         {
-            get 
+            get => _weight;
+            set
             {
-                return _createGraphCommand ??= new RelayCommand(obj => CreateGraph(obj));
+                _weight = value;
+                OnPropertyChanged(nameof(Weight));
             }
-            set { _createGraphCommand = value; } 
+        }
+
+        public Direction SelectedDirection
+        {
+            get => _selectedDirection;
+            set
+            {
+                _selectedDirection = value;
+                OnPropertyChanged(nameof(SelectedDirection));
+            }
+        }
+
+        public RelayCommand SaveCommand
+        {
+            get => _saveCommand ??= new RelayCommand(_ => SaveProjectCommand(), _ => IsSaveAvailable);
+            set { _saveCommand = value; }
+        }
+
+        public RelayCommand SaveAsCommand
+        {
+            get => _saveAsCommand ??= new RelayCommand(_ => SaveAsProjectCommand(), _ => IsSaveAsAvailable);
+            set { _saveAsCommand = value; }
+        }
+
+        public RelayCommand OpenCommand
+        {
+            get => _openCommand ??= new RelayCommand(obj => OpenProjectCommand(obj), obj => obj is Grid);
+            set { _openCommand = value; }
+        }
+
+        public RelayCommand CreateGraphCommand
+        {
+            get => _createGraphCommand ??= new RelayCommand(obj => CreateGraph(obj), obj => obj is GraphTypes);
+            set { _createGraphCommand = value; }
         }
 
         public RelayCommand AddNodeCommand
         {
-            get
-            {
-                return _addNodeCommand ??= new RelayCommand(obj => AddOrSelectNode(obj), obj => obj is Grid && _model.Graph != null);
-            }
+            get => _addNodeCommand ??= new RelayCommand(obj => AddNodeOrEdge(obj), obj => obj is Grid && _model.Graph != null);
             set { _addNodeCommand = value; }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName] string prop = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        private void SaveAsProjectCommand()
+        {
+            _savePath = ProjectSerializer.SerializeXML(new SerializebleGraphModel(_model));
+        }
+
+        private void SaveProjectCommand()
+        {
+            ProjectSerializer.SerializeXML(new SerializebleGraphModel(_model), _savePath);
+        }
+
+        private void OpenProjectCommand(object obj)
+        {
+            if (obj is Grid grid)
+            {
+                (string savePath, GraphModel model) = ProjectSerializer.DeserializeXML();
+                SetModel(grid, model);
+                _savePath = savePath;
+
+                OnPropertyChanged(nameof(IsDirected));
+                OnPropertyChanged(nameof(IsWeightened));
+                OnPropertyChanged(nameof(IsSaveAvailable));
+                OnPropertyChanged(nameof(IsSaveAsAvailable));
+            }
+        }
+
+        private void SetModel(Grid grid, GraphModel model)
+        {
+            if (model == null) return;
+
+            _model = model;
+            grid.Children.Clear();
+
+            foreach (var view in model.EdgeViews.Values)
+            {
+                grid.Children.Add(view.Edge);
+
+                if (view.Arrows != null)
+                    foreach (var arrow in view.Arrows)
+                        grid.Children.Add(arrow);
+
+                if (view.Weight != null)
+                    grid.Children.Add(view.Weight);
+            }
+
+            foreach (var view in model.NodeViews.Keys)
+            {
+                grid.Children.Add(view.Node);
+                grid.Children.Add(view.Name);
+            }
+
+            NodeNameSequence.SetStart(model.Graph.Nodes.Max(x => int.Parse(x.Name)));
+        }
 
         private void CreateGraph(object obj)
         {
             var type = (GraphTypes)obj;
             _model.Graph = _creator.Create(type);
+            OnPropertyChanged(nameof(IsDirected));
+            OnPropertyChanged(nameof(IsWeightened));
+            OnPropertyChanged(nameof(IsSaveAsAvailable));
         }
 
-        private void AddOrSelectNode(object obj)
+        private void AddNodeOrEdge(object obj)
         {
             Grid grid = (Grid)obj;
 
-            (bool isMouseOverNode, Node? node) = IsMouseOverNode(grid);
+            (bool isMouseOverNode, NodeView? node) = IsMouseOverNode(grid);
 
             if (isMouseOverNode)
             {
@@ -71,38 +177,72 @@ namespace GoGraph.ViewModel
                 else
                     UnselectNode(node);
 
-                if (firstSelected != null && secondSelected != null)
+                if (_firstSelected != null && _secondSelected != null)
                 {
-                    Point first = MathTool.CalcPointWithOffset(firstSelected, secondSelected);
-                    Point second = MathTool.CalcPointWithOffset(secondSelected, firstSelected);
+                    AddEdge(grid);
 
-                    EdgeViewBuilder edgeBuilder = new EdgeViewBuilder();
-                    EdgeView edgeView = edgeBuilder
-                        .SetDirection(Direction.FirstToSecond)
-                        .SetPoints(first, second)
-                        .SetWeight(10)
-                        .Build();
-
-                    grid.Children.Add(edgeView.Edge);
-                    grid.Children.Add(edgeView.Weight);
-
-                    foreach (var line in edgeView.Arrows)
-                        grid.Children.Add(line);
-
-                    Edge edge = new DirectedEdge();
-                    edge.First = firstSelected; 
-                    edge.Second = secondSelected;
-                    edge.View = edgeView;
-                    //TODO: appropriate edge creating
-                    _model.Graph.Edges.Add(edge);
-
-                    UnselectNode(firstSelected);
-                    UnselectNode(secondSelected);
+                    UnselectNode(_firstSelected);
+                    UnselectNode(_secondSelected);
                 }
 
                 return;
             }
 
+            AddNode(grid);
+        }
+
+        private (bool, NodeView?) IsMouseOverNode(Grid grid)
+        {
+            Point curPos = Mouse.GetPosition(grid);
+
+            foreach (var node in _model.NodeViews.Keys)
+                if (curPos.X > node.Node.Margin.Left && curPos.X < node.Node.Margin.Left + node.Node.Width)
+                    if (curPos.Y > node.Node.Margin.Top && curPos.Y < node.Node.Margin.Top + node.Node.Height)
+                        return (true, node);
+
+            return (false, null);
+        }
+
+        private void AddEdge(Grid grid)
+        {
+            if (_firstSelected == null || _secondSelected == null) return;
+
+            Point first = MathTool.CalcPointWithOffset(_firstSelected, _secondSelected);
+            Point second = MathTool.CalcPointWithOffset(_secondSelected, _firstSelected);
+
+            EdgeViewBuilder edgeViewBuilder = new EdgeViewBuilder();
+            edgeViewBuilder.SetPoints(first, second);
+
+            EdgeBuilder edgeBuilder = new EdgeBuilder();
+            edgeBuilder.SetNodes(_model.NodeViews[_firstSelected], _model.NodeViews[_secondSelected]);
+
+            SetWeight(edgeBuilder, edgeViewBuilder);
+
+            SetDirection(edgeBuilder, edgeViewBuilder);
+
+            Edge edge = edgeBuilder.Build();
+            EdgeView edgeView = edgeViewBuilder.Build();
+
+            DrawEdge(grid, edgeView);
+
+            _model.EdgeViews.Add(edge, edgeView);
+            _model.Graph.Edges.Add(edge);
+        }
+
+        private void DrawEdge(Grid grid, EdgeView edgeView)
+        {
+            grid.Children.Add(edgeView.Edge);
+
+            if (IsWeightened)
+                grid.Children.Add(edgeView.Weight);
+
+            if (IsDirected)
+                foreach (var line in edgeView.Arrows)
+                    grid.Children.Add(line);
+        }
+
+        private void AddNode(Grid grid)
+        {
             string name = NodeNameSequence.Next.ToString();
 
             Point curPos = Mouse.GetPosition(grid);
@@ -116,48 +256,79 @@ namespace GoGraph.ViewModel
             grid.Children.Add(view.Name);
             Node newNode = new Node
             {
-                Name = name,
-                View = view
+                Name = name
             };
             _model.Graph.Nodes.Add(newNode);
+            _model.NodeViews.Add(view, newNode);
         }
 
-        private (bool, Node?) IsMouseOverNode(Grid grid)
+        private void SetDirection(EdgeBuilder edgeBuilder, EdgeViewBuilder edgeViewBuilder)
         {
-            Point curPos = Mouse.GetPosition(grid);
+            if (_firstSelected == null || _secondSelected == null) return;
 
-            foreach (var node in _model.Graph.Nodes)
-                if (curPos.X > node.View.Node.Margin.Left && curPos.X < node.View.Node.Margin.Left + node.View.Node.Width)
-                    if (curPos.Y > node.View.Node.Margin.Top && curPos.Y < node.View.Node.Margin.Top + node.View.Node.Height)
-                        return (true, node);
+            Node first = _model.NodeViews[_firstSelected];
+            Node second = _model.NodeViews[_secondSelected];
 
-            return (false, null);
-        }
-
-        private void AddEdge(object obj)
-        {
-
-        }
-
-        private void SelectNode(Node node)
-        {
-            node.View.Node.Stroke = Brushes.Yellow;
-            node.View.Node.Fill = Brushes.LightYellow;
-            node.IsSelected = true;
-            if (firstSelected == null)
-                firstSelected = node;
+            if (IsDirected)
+            {
+                edgeViewBuilder.SetDirection(SelectedDirection);
+                edgeBuilder.SetDirection(SelectedDirection);
+                switch (SelectedDirection)
+                {
+                    case Direction.FirstToSecond: first.Next.Add(second); break;
+                    case Direction.SecondToFirst: second.Next.Add(first); break;
+                    case Direction.Both:
+                        {
+                            first.Next.Add(second);
+                            second.Next.Add(first);
+                            break;
+                        }
+                }
+            }
             else
-                secondSelected = node;
+            {
+                first.Next.Add(second);
+                second.Next.Add(first);
+            }
         }
 
-        private void UnselectNode(Node node)
+        private void SetWeight(EdgeBuilder edgeBuilder, EdgeViewBuilder edgeViewBuilder)
         {
-            node.View.Node.Stroke = Brushes.Black;
-            node.View.Node.Fill = Brushes.White;
-            node.IsSelected = false;
-            if (firstSelected == node)
-                firstSelected = null;
-            else secondSelected = null;
+            if (_firstSelected == null || _secondSelected == null) return;
+
+            if (IsWeightened)
+            {
+                if (int.TryParse(Weight, out int w))
+                {
+                    edgeViewBuilder.SetWeight(w);
+                    edgeBuilder.SetWeight(w);
+                }
+                else throw new ArgumentException();
+            }
         }
+
+        private void SelectNode(NodeView node)
+        {
+            node.Node.Stroke = Brushes.Yellow;
+            node.Node.Fill = Brushes.LightYellow;
+            node.IsSelected = true;
+            if (_firstSelected == null)
+                _firstSelected = node;
+            else
+                _secondSelected = node;
+        }
+
+        private void UnselectNode(NodeView node)
+        {
+            node.Node.Stroke = Brushes.Black;
+            node.Node.Fill = Brushes.White;
+            node.IsSelected = false;
+            if (_firstSelected == node)
+                _firstSelected = null;
+            else _secondSelected = null;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string prop = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
     }
 }

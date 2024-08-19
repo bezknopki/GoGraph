@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:GoGraph" xmlns:gt="clr-namespace:GoGraph.Graph.GraphCreator"
+        xmlns:local="clr-namespace:GoGraph" xmlns:gt="clr-namespace:GoGraph.Graph.Graphs.GraphCreator"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
@@ -24,15 +24,23 @@
         <Menu Height ="20" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0">
             <MenuItem Header="File">
                 <MenuItem Header="New Project">
-                    <MenuItem Header="Simple Graph" Command="{Binding CreateGrapghCommand}" CommandParameter="{x:Static gt:GraphTypes.Simple}"/>
-                    <MenuItem Header="Weightened Graph" Command="{Binding CreateGrapghCommand}" CommandParameter="{x:Static gt:GraphTypes.Weightened}"/>
-                    <MenuItem Header="Directed Graph" Command="{Binding CreateGrapghCommand}" CommandParameter="{x:Static gt:GraphTypes.Directed}"/>
-                    <MenuItem Header="Directed Weightened Graph" Command="{Binding CreateGrapghCommand}" CommandParameter="{x:Static gt:GraphTypes.DirectedWeightened}"/>
+                    <MenuItem Header="Simple Graph" Command="{Binding CreateGrapgCommand}" CommandParameter="{x:Static gt:GraphTypes.Simple}"/>
+                    <MenuItem Header="Weightened Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Weightened}"/>
+                    <MenuItem Header="Directed Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Directed}"/>
+                    <MenuItem Header="Directed Weightened Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.DirectedWeightened}"/>
                 </MenuItem>
-                <MenuItem Header="Open Project"/>
-                <MenuItem Header="Save"/>
-                <MenuItem Header="Save As..."/>
+                <MenuItem Header="Open Project" Command="{Binding OpenCommand}" CommandParameter="{Binding ElementName=grid}"/>
+                <MenuItem Header="Save" IsEnabled="{Binding IsSaveAvailable, UpdateSourceTrigger=PropertyChanged}" Command="{Binding SaveCommand}"/>
+                <MenuItem Header="Save As..." IsEnabled="{Binding IsSaveAsAvailable, UpdateSourceTrigger=PropertyChanged}" Command="{Binding SaveAsCommand}"/>
             </MenuItem>
         </Menu>
+        <TextBlock Text="Choose edge direction:" Grid.Row="1" Grid.Column="1" Height="20" VerticalAlignment="Top"/>
+        <ComboBox ItemsSource="{Binding Directions}" SelectedItem="{Binding SelectedDirection}" Grid.Row="1" Grid.Column="1" Height="20" 
+                  VerticalAlignment="Top" IsEnabled="{Binding IsDirected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                  Margin="0 20 0 0"/>
+        <TextBlock Text="Set Weight:" Grid.Row="1" Grid.Column="1" Margin="0 40 0 0" Height="20" VerticalAlignment="Top"/>
+        <TextBox IsEnabled="{Binding IsWeightened, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                 Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Height="20" Margin="0 60 0 0"
+                 PreviewTextInput="NumberValidationTextBox"  Text="{Binding Weight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </Window>
