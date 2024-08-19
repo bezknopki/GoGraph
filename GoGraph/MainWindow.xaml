@@ -24,7 +24,7 @@
         <Menu Height ="20" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0">
             <MenuItem Header="File">
                 <MenuItem Header="New Project">
-                    <MenuItem Header="Simple Graph" Command="{Binding CreateGrapgCommand}" CommandParameter="{x:Static gt:GraphTypes.Simple}"/>
+                    <MenuItem Header="Simple Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Simple}"/>
                     <MenuItem Header="Weightened Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Weightened}"/>
                     <MenuItem Header="Directed Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Directed}"/>
                     <MenuItem Header="Directed Weightened Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.DirectedWeightened}"/>
