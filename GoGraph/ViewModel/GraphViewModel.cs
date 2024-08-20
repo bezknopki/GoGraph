@@ -38,6 +38,7 @@ namespace GoGraph.ViewModel
         private RelayCommand _saveAsCommand;
         private RelayCommand _beginSearchCommand;
         private RelayCommand _undoLastActionCommand;
+        private RelayCommand _removeCommand;
 
         private List<Direction> _directions = new List<Direction> { Direction.FirstToSecond, Direction.SecondToFirst, Direction.Both };
 
@@ -81,6 +82,13 @@ namespace GoGraph.ViewModel
             }
         }
 
+        #region COMMANDS
+        public RelayCommand RemoveCommand
+        {
+            get => _removeCommand ??= new RelayCommand(obj => Remove(obj));
+            set { _removeCommand = value; }
+        }
+
         public RelayCommand UndoLastActionCommand
         {
             get => _undoLastActionCommand ??= new RelayCommand(obj => UndoLastAction(obj));
@@ -121,6 +129,55 @@ namespace GoGraph.ViewModel
         {
             get => _addNodeCommand ??= new RelayCommand(obj => AddNodeOrEdge(obj), obj => obj is Grid && _model.Graph != null);
             set { _addNodeCommand = value; }
+        }
+        #endregion
+
+        private void Remove(object obj)
+        {
+            //TODO: add history remove
+            if (obj is Grid grid)
+            {
+                (bool isMouseOverEdge, EdgeView? edgeView) = IsMouseOverEdge(grid);
+                if (isMouseOverEdge) RemoveEdge(grid, edgeView);
+
+                (bool isMouseOverNode, NodeView? nodeView) = IsMouseOverNode(grid);
+                if (isMouseOverNode) RemoveNode(grid, nodeView);
+            }
+        }
+
+        private void RemoveNode(Grid grid, NodeView nodeView)
+        {
+            grid.Children.Remove(nodeView.Node);
+            grid.Children.Remove(nodeView.Name);
+            Node associatedNode = _model.Graph.Nodes.First(x => x.Name == nodeView.Name.Text);
+            foreach (var node in _model.Graph.Nodes)
+                if (node.Next.Contains(associatedNode))
+                    node.Next.Remove(associatedNode);
+
+            List<Edge> toRemove = new List<Edge>();
+            foreach (var edge in _model.Graph.Edges)
+                if (edge.First == associatedNode || edge.Second == associatedNode)
+                    toRemove.Add(edge);
+
+            foreach (var e in toRemove)
+                RemoveEdge(grid, _model.EdgesToViews[e]);
+
+            UnselectNode(nodeView);
+        }
+
+        private void RemoveEdge(Grid grid, EdgeView edgeView)
+        {
+            grid.Children.Remove(edgeView.Edge);
+            if (edgeView.Weight != null)
+                grid.Children.Remove(edgeView.Weight);
+
+            if (edgeView.Arrows != null)
+                foreach (var arr in edgeView.Arrows)
+                    grid.Children.Remove(arr);
+
+            Edge associatedEdge = _model.EdgesToViews.First(x => x.Value == edgeView).Key;
+            _model.Graph.Edges.Remove(associatedEdge);
+            _model.EdgesToViews.Remove(associatedEdge);
         }
 
         private async void BeginSearch()
@@ -195,7 +252,7 @@ namespace GoGraph.ViewModel
             {
                 var elements = HistoryManager.Undo();
                 foreach (var element in elements)
-                        grid.Children.Remove(element);
+                    grid.Children.Remove(element);
             }
         }
 
@@ -247,6 +304,17 @@ namespace GoGraph.ViewModel
             return (false, null);
         }
 
+        private (bool, EdgeView?) IsMouseOverEdge(Grid grid)
+        {
+            Point curPos = Mouse.GetPosition(grid);
+
+            foreach (var edge in _model.EdgeViews)
+                if (edge.Edge.IsMouseDirectlyOver)
+                    return (true, edge);
+
+            return (false, null);
+        }
+
         private void AddEdge(Grid grid)
         {
             if (_firstSelected == null || _secondSelected == null) return;
@@ -283,7 +351,8 @@ namespace GoGraph.ViewModel
             he.Elements.Add(edgeView.Edge);
             if (edgeView.Weight != null)
                 he.Elements.Add(edgeView.Weight);
-            he.Elements.AddRange(edgeView.Arrows);
+            if (edgeView.Arrows != null)
+                he.Elements.AddRange(edgeView.Arrows);
             HistoryManager.Push(he);
 
             _model.EdgeViews.Add(edgeView);

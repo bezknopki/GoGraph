@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GoGraph" xmlns:gt="clr-namespace:GoGraph.Graph.Graphs.GraphCreator"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.InputBindings>
@@ -24,6 +25,11 @@
                 <Grid.InputBindings>
                     <MouseBinding MouseAction="LeftClick" Command="{Binding AddNodeCommand}" CommandParameter="{Binding ElementName=grid}"/>
                 </Grid.InputBindings>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseRightButtonDown">
+                        <i:InvokeCommandAction Command="{Binding RemoveCommand}" CommandParameter="{Binding ElementName=grid}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
             </Grid>
         </Border>
         <Menu Height ="20" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0">
