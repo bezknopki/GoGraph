@@ -49,7 +49,7 @@ namespace GoGraph.ViewElements
                 Arrows = ViewElementsCreator.CreateArrows(_direction, _p1, _p2)
             };
 
-        private TextBlock CreateWeightTextBlock()
+        private Border CreateWeightTextBlock()
         {
             if (!_isWeightened) return null;
 

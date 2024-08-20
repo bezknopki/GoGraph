@@ -10,8 +10,9 @@ namespace GoGraph.Serializer
     [Serializable]
     public class SerializebleGraphModel
     {
-        public List<SItem<SNodeView, SNode>> NodeViews { get; set; } = new List<SItem<SNodeView, SNode>>();
-        public List<SItem<SEdge, SEdgeView>> EdgeViews { get; set; } = new List<SItem<SEdge, SEdgeView>>();
+        public List<SNodeView> NodeViews { get; set; } = new List<SNodeView>();
+        public List<SEdgeView> EdgeViews { get; set; } = new List<SEdgeView>();
+        public List<SItem<SEdge, SEdgeView>> EdgesToViews { get; set; } = new List<SItem<SEdge, SEdgeView>>();
         public bool IsWeightened { get; set; }
         public bool IsDirected { get; set; }
         public List<SNode> Nodes { get; set; } = new List<SNode>();
@@ -25,17 +26,16 @@ namespace GoGraph.Serializer
 
         public SerializebleGraphModel(GraphModel model)
         {
-            foreach (var kvp in model.EdgeViews)         
-                EdgeViews.Add(new SItem<SEdge, SEdgeView>(new SEdge(kvp.Key), new SEdgeView(kvp.Value)));           
-
-            foreach (var kvp in model.NodeViews)
-                NodeViews.Add(new SItem<SNodeView, SNode>(new SNodeView(kvp.Key), new SNode(kvp.Value)));
+            EdgeViews = model.EdgeViews.Select(x => new SEdgeView(x)).ToList();
+            NodeViews = model.NodeViews.Select(x => new SNodeView(x)).ToList();
 
             IsDirected = model.Graph.IsDirected;
             IsWeightened = model.Graph.IsWeightened;
 
             Edges = model.Graph.Edges.Select(x => new SEdge(x)).ToList();
             Nodes = model.Graph.Nodes.Select(x => new SNode(x)).ToList();
+
+            EdgesToViews = model.EdgesToViews.Select(x => new SItem<SEdge, SEdgeView>(new SEdge(x.Key), new SEdgeView(x.Value))).ToList();
 
             if (IsDirected && IsWeightened) GraphType = GraphTypes.DirectedWeightened;
             else if (!IsDirected && IsWeightened) GraphType = GraphTypes.Weightened;
@@ -60,18 +60,9 @@ namespace GoGraph.Serializer
                 node.Next = nodes.Where(x => sNode.Next.Contains(x.Name)).ToList();
             }
 
-            Dictionary<NodeView, Node> nodeViews = new Dictionary<NodeView, Node>();
+            List<NodeView> nodeViews = NodeViews.Select(x => x.ToNodeView()).ToList();
 
-            foreach (var si in NodeViews)
-                nodeViews.Add(si.Item1.ToNodeView(), nodes.First(x => x.Name == si.Item2.Name));
-
-            Dictionary<Edge, EdgeView> edgeViews = new Dictionary<Edge, EdgeView>();
-
-            foreach (var si in EdgeViews)
-                edgeViews.Add(si.Item1.ToEdge(
-                    nodes.First(x => x.Name == si.Item1.First.Name),
-                    nodes.First(x => x.Name == si.Item1.Second.Name)),
-                    si.Item2.ToEdgeView());
+            List<EdgeView> edgeViews = EdgeViews.Select(x => x.ToEdgeView()).ToList();            
 
             GraphBase graph = new SimpleGraphCreator().Create(GraphType);
             graph.Nodes = nodes;
@@ -80,11 +71,28 @@ namespace GoGraph.Serializer
                     nodes.First(v => v.Name == x.Second.Name)))
                 .ToList();
 
+            Dictionary<Edge, EdgeView> edgesToViews = new Dictionary<Edge, EdgeView>();
+
+            foreach (var etv in EdgesToViews)
+            {
+                Edge edge;
+                EdgeView edgeView;
+
+                edge = graph.Edges.First(x => x.First.Name == etv.Item1.First.Name && x.Second.Name == etv.Item1.Second.Name);
+                edgeView = edgeViews.First(x => x.Edge.X1 == etv.Item2.P1.X 
+                && x.Edge.Y1 == etv.Item2.P1.Y
+                && x.Edge.X2 == etv.Item2.P2.X
+                && x.Edge.Y2 == etv.Item2.P2.Y);
+
+                edgesToViews.Add(edge, edgeView);
+            }
+
             return new GraphModel
             {
                 EdgeViews = edgeViews,
                 NodeViews = nodeViews,
-                Graph = graph
+                Graph = graph,
+                EdgesToViews = edgesToViews
             };
         }
     }

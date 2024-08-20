@@ -6,6 +6,9 @@
         xmlns:local="clr-namespace:GoGraph" xmlns:gt="clr-namespace:GoGraph.Graph.Graphs.GraphCreator"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.InputBindings>
+        <KeyBinding Key="Z" Modifiers="Ctrl" Command="{Binding UndoLastActionCommand}" CommandParameter="{Binding ElementName=grid}"/>
+    </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"></RowDefinition>
@@ -16,11 +19,13 @@
             <ColumnDefinition Width="4*"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Grid Name="grid" Grid.Row="1" Grid.Column="0" Background="LightCyan">
-            <Grid.InputBindings>
-                <MouseBinding MouseAction="LeftClick" Command="{Binding AddNodeCommand}" CommandParameter="{Binding ElementName=grid}"/>
-            </Grid.InputBindings>
-        </Grid>
+        <Border BorderThickness="1" Grid.Row="1" Grid.Column="0" BorderBrush="Black">
+            <Grid Name="grid"  Background="LightCyan">
+                <Grid.InputBindings>
+                    <MouseBinding MouseAction="LeftClick" Command="{Binding AddNodeCommand}" CommandParameter="{Binding ElementName=grid}"/>
+                </Grid.InputBindings>
+            </Grid>
+        </Border>
         <Menu Height ="20" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0">
             <MenuItem Header="File">
                 <MenuItem Header="New Project">
@@ -42,5 +47,6 @@
         <TextBox IsEnabled="{Binding IsWeightened, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                  Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Height="20" Margin="0 60 0 0"
                  PreviewTextInput="NumberValidationTextBox"  Text="{Binding Weight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Height="20" Margin="0 90 0 0" Command="{Binding BeginSearchCommand}">Start</Button>
     </Grid>
 </Window>

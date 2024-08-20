@@ -1,5 +1,6 @@
 ﻿using GoGraph.ViewElements;
 using System.Windows.Shapes;
+using System.Windows.Controls;
 
 namespace GoGraph.Serializer
 {
@@ -27,7 +28,7 @@ namespace GoGraph.Serializer
 
             if (HasWeight)
             {
-                WeightText = edgeView.Weight.Text;
+                WeightText = ((TextBlock)edgeView.Weight.Child).Text;
                 WeightMarginTop = edgeView.Weight.Margin.Top;
                 WeightMarginLeft = edgeView.Weight.Margin.Left;
             }
