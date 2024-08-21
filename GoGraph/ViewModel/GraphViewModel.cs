@@ -22,6 +22,8 @@ using System.Printing;
 using GoGraph.Serializer;
 using GoGraph.Algorithms.UninformedSearch;
 using GoGraph.History;
+using GoGraph.Algorithms.ShortestWay;
+using System.Collections.ObjectModel;
 
 namespace GoGraph.ViewModel
 {
@@ -61,6 +63,7 @@ namespace GoGraph.ViewModel
         public bool IsWeightened => _model.Graph != null && _model.Graph.IsWeightened;
         public bool IsSaveAvailable => !string.IsNullOrEmpty(_savePath);
         public bool IsSaveAsAvailable => _model.Graph != null;
+        public ObservableCollection<string> Results { get; set; } = new ObservableCollection<string>();
 
         public string Weight
         {
@@ -97,7 +100,7 @@ namespace GoGraph.ViewModel
 
         public RelayCommand BeginSearchCommand
         {
-            get => _beginSearchCommand ??= new RelayCommand(_ => BeginSearch());
+            get => _beginSearchCommand ??= new RelayCommand(obj => BeginSearch(obj));
             set { _beginSearchCommand = value; }
         }
 
@@ -151,7 +154,7 @@ namespace GoGraph.ViewModel
             grid.Children.Remove(nodeView.Name);
             Node associatedNode = _model.Graph.Nodes.First(x => x.Name == nodeView.Name.Text);
             foreach (var node in _model.Graph.Nodes)
-                if (node.Next.Contains(associatedNode))
+                if (node.Next.ContainsKey(associatedNode))
                     node.Next.Remove(associatedNode);
 
             List<Edge> toRemove = new List<Edge>();
@@ -177,19 +180,32 @@ namespace GoGraph.ViewModel
 
             Edge associatedEdge = _model.EdgesToViews.First(x => x.Value == edgeView).Key;
             _model.Graph.Edges.Remove(associatedEdge);
+
+            if (associatedEdge.First.Next.ContainsKey(associatedEdge.Second))
+                associatedEdge.First.Next.Remove(associatedEdge.Second);
+
+            if (associatedEdge.Second.Next.ContainsKey(associatedEdge.First))
+                associatedEdge.Second.Next.Remove(associatedEdge.First);
+
             _model.EdgesToViews.Remove(associatedEdge);
         }
 
-        private async void BeginSearch()
+        private async void BeginSearch(object obj)
         {
             AnimationHelper.Model = _model;
-            BreadthFirstSearch bfs = new();
+            AnimationHelper.Grid = (Grid)obj;
+            Dijkstra bfs = new();
 
-            bfs.HighlightNodeEvent += AnimationHelper.HighlightNode;
-            bfs.HighlightEdgeEvent += AnimationHelper.HighlightEdgeBetweenNodes;
+            //bfs.HighlightNodeEvent += AnimationHelper.HighlightNode;
+            //bfs.HighlightEdgeEvent += AnimationHelper.HighlightEdgeBetweenNodes;
 
-            string res = await bfs.Start(_model.Graph.Nodes.First());
-            MessageBox.Show(res);
+            //string res = await bfs.Start(_model.Graph.Nodes.First());
+            //MessageBox.Show(res);
+
+            Way w = await bfs.FindShortestWay(_model.Graph, _model.Graph.Nodes.First(), _model.Graph.Nodes.First(x => x.Name == "5"));
+            await AnimationHelper.WalkThrough(w);
+            AnimationHelper.Reset();
+            Results.Add(w.ToString());
         }
 
         private void SaveAsProjectCommand()
@@ -323,7 +339,8 @@ namespace GoGraph.ViewModel
             Point second = MathTool.CalcPointWithOffset(_secondSelected, _firstSelected);
 
             EdgeViewBuilder edgeViewBuilder = new EdgeViewBuilder();
-            edgeViewBuilder.SetPoints(first, second);
+            edgeViewBuilder.SetPoints(first, second)
+                .SetDirection(_model.Graph.IsDirected ? _selectedDirection : Direction.None);
 
             EdgeBuilder edgeBuilder = new EdgeBuilder();
             edgeBuilder.SetNodes(
@@ -331,8 +348,6 @@ namespace GoGraph.ViewModel
                 GetNodeByView(_secondSelected));
 
             SetWeight(edgeBuilder, edgeViewBuilder);
-
-            SetDirection(edgeBuilder, edgeViewBuilder);
 
             Edge edge = edgeBuilder.Build();
             if (_model.Graph.Edges.Contains(edge))
@@ -343,6 +358,31 @@ namespace GoGraph.ViewModel
             EdgeView edgeView = edgeViewBuilder.Build();
 
             DrawEdge(grid, edgeView);
+
+            Node fNode = GetNodeByView(_firstSelected);
+            Node sNode = GetNodeByView(_secondSelected);
+
+            if (IsDirected)
+            {
+                edgeViewBuilder.SetDirection(SelectedDirection);
+                edgeBuilder.SetDirection(SelectedDirection);
+                switch (SelectedDirection)
+                {
+                    case Direction.FirstToSecond: fNode.Next.Add(sNode, edge); break;
+                    case Direction.SecondToFirst: sNode.Next.Add(fNode, edge); break;
+                    case Direction.Both:
+                        {
+                            fNode.Next.Add(sNode, edge);
+                            sNode.Next.Add(fNode, edge);
+                            break;
+                        }
+                }
+            }
+            else
+            {
+                fNode.Next.Add(sNode, edge);
+                sNode.Next.Add(fNode, edge);
+            }
 
             HistoryElement he = new HistoryElement();
             he.ActionType = ActionType.Add;
@@ -402,36 +442,6 @@ namespace GoGraph.ViewModel
             _model.NodeViews.Add(view);
         }
 
-        private void SetDirection(EdgeBuilder edgeBuilder, EdgeViewBuilder edgeViewBuilder)
-        {
-            if (_firstSelected == null || _secondSelected == null) return;
-
-            Node first = GetNodeByView(_firstSelected);
-            Node second = GetNodeByView(_secondSelected);
-
-            if (IsDirected)
-            {
-                edgeViewBuilder.SetDirection(SelectedDirection);
-                edgeBuilder.SetDirection(SelectedDirection);
-                switch (SelectedDirection)
-                {
-                    case Direction.FirstToSecond: first.Next.Add(second); break;
-                    case Direction.SecondToFirst: second.Next.Add(first); break;
-                    case Direction.Both:
-                        {
-                            first.Next.Add(second);
-                            second.Next.Add(first);
-                            break;
-                        }
-                }
-            }
-            else
-            {
-                first.Next.Add(second);
-                second.Next.Add(first);
-            }
-        }
-
         private void SetWeight(EdgeBuilder edgeBuilder, EdgeViewBuilder edgeViewBuilder)
         {
             if (_firstSelected == null || _secondSelected == null) return;
@@ -468,7 +478,7 @@ namespace GoGraph.ViewModel
             else _secondSelected = null;
         }
 
-        private Node? GetNodeByView(NodeView view) => _model.Graph?.Nodes.First(x => x.Name == view.Name.Text);
+        private Node GetNodeByView(NodeView view) => _model.Graph?.Nodes.First(x => x.Name == view.Name.Text);
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));

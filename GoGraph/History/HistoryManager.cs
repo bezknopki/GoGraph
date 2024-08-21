@@ -37,7 +37,7 @@ namespace GoGraph.History
             {
                 Model.Graph.Nodes.Remove(el);
                 foreach (var node in Model.Graph.Nodes)
-                    if (node.Next.Contains(el))
+                    if (node.Next.ContainsKey(el))
                         node.Next.Remove(node);
             }
 

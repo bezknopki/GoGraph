@@ -53,23 +53,27 @@ namespace GoGraph.Serializer
                 node.Name = sNode.Name;
                 nodes.Add(node);
             }
-
-            foreach (var node in nodes)
-            {
-                SNode sNode = Nodes.First(x => x.Name == node.Name);
-                node.Next = nodes.Where(x => sNode.Next.Contains(x.Name)).ToList();
-            }
-
+           
             List<NodeView> nodeViews = NodeViews.Select(x => x.ToNodeView()).ToList();
 
             List<EdgeView> edgeViews = EdgeViews.Select(x => x.ToEdgeView()).ToList();            
 
             GraphBase graph = new SimpleGraphCreator().Create(GraphType);
-            graph.Nodes = nodes;
+            
             graph.Edges = Edges.Select(x => x.ToEdge(
                     nodes.First(v => v.Name == x.First.Name),
                     nodes.First(v => v.Name == x.Second.Name)))
                 .ToList();
+
+            foreach (var node in nodes)
+            {
+                SNode sNode = Nodes.First(x => x.Name == node.Name);
+                foreach (var nextNode in nodes)
+                    if (sNode.Next.Contains(nextNode.Name))
+                        node.Next.Add(nextNode, GetEdgeBetweenNodes(graph, node, nextNode));
+            }
+
+            graph.Nodes = nodes;
 
             Dictionary<Edge, EdgeView> edgesToViews = new Dictionary<Edge, EdgeView>();
 
@@ -95,5 +99,8 @@ namespace GoGraph.Serializer
                 EdgesToViews = edgesToViews
             };
         }
+
+        private Edge GetEdgeBetweenNodes(GraphBase graph, Node from, Node to) => graph.Edges.First(x => x.First == from && x.Second == to
+        || ((x.Direction == Direction.SecondToFirst || x.Direction == Direction.Both || x.Direction == Direction.None) && x.First == to && x.Second == from));
     }
 }

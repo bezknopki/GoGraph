@@ -14,7 +14,7 @@ namespace GoGraph.ViewElements
     public class Arrow
     {
         const double arrowAngle = Math.PI / 8;
-        const double radius = 30;
+        const double radius = 20;
 
         private Point arrowPoint;
         private Point startPoint;

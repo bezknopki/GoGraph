@@ -13,7 +13,7 @@ namespace GoGraph.Serializer
         public SNode(Node node)
         {
             Name = node.Name;
-            foreach (var next in node.Next)
+            foreach (var next in node.Next.Keys)
                 Next.Add(next.Name);
         }       
     }

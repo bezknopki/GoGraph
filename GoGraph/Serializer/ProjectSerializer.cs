@@ -20,6 +20,8 @@ namespace GoGraph.Serializer
             if (sfd.ShowDialog() == true)
             {
                 path = sfd.FileName;
+                if (File.Exists(path))
+                    File.Delete(path);
                 using FileStream fs = new FileStream(path, FileMode.OpenOrCreate);
                 _serializer.Serialize(fs, model);
             }

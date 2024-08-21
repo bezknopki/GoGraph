@@ -27,10 +27,10 @@ namespace GoGraph.Algorithms.UninformedSearch
 
                 result.Append($"{cur.Name}, ");
 
-                foreach (var nextNode in cur.Next)
+                foreach (var nextNode in cur.Next.Keys)
                     if (!_visited.Contains(nextNode))
                     {
-                        AnimationHelper.HighlightEdgeBetweenNodes(cur, nextNode);
+                        //AnimationHelper.HighlightEdgeBetweenNodes(cur, nextNode);
                         _nodes.Push(nextNode);
                         await Task.Delay(_delay);
                     }

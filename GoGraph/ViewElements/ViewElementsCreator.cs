@@ -54,9 +54,18 @@ namespace GoGraph.ViewElements
                 StrokeThickness = 3
             };
 
+        public static Border CreateMark(double mLeft, double mTop, string mark)
+        {
+            Border borderWithText = CreateBorderWithWeight(mark, Brushes.AliceBlue);
+
+            borderWithText.Margin = new Thickness(mLeft, mTop, 0, 0);
+
+            return borderWithText;
+        }
+
         public static Border CreateWeightTextBlock(double mLeft, double mTop, string weight)
         {
-            Border borderWithText = CreateBorderWithWeight(weight);
+            Border borderWithText = CreateBorderWithWeight(weight, Brushes.LightCoral);
             
             borderWithText.Margin = new Thickness(mLeft, mTop, 0, 0);
 
@@ -71,7 +80,7 @@ namespace GoGraph.ViewElements
                 Y = Math.Abs((p1.Y - p2.Y) / 2) + Math.Min(p1.Y, p2.Y)
             };
 
-            Border borderWithText = CreateBorderWithWeight(weight.ToString());
+            Border borderWithText = CreateBorderWithWeight(weight.ToString(), Brushes.LightCoral);
             TextBlock weightTextBlock = (TextBlock)borderWithText.Child;         
 
             borderWithText.Margin = new Thickness(center.X - weightTextBlock.ActualWidth / 2, center.Y - ViewConstants.WeightBlockSide / 2, 0, 0);
@@ -79,7 +88,7 @@ namespace GoGraph.ViewElements
             return borderWithText;
         }
 
-        public static List<Polyline>? CreateArrows(Direction direction, Point p1, Point p2)
+        public static List<Polyline> CreateArrows(Direction direction, Point p1, Point p2)
         {
             List<Polyline> arrows = new List<Polyline>();
             Arrow arrow = new Arrow();
@@ -106,20 +115,20 @@ namespace GoGraph.ViewElements
                         arrows.Add(arrow.GetArrowView());
                         break;
                     }
-                default: return null;
+                default: return arrows;
             }
 
             return arrows;
         }
 
-        private static Border CreateBorderWithWeight(string weight)
+        private static Border CreateBorderWithWeight(string weight, SolidColorBrush bg)
         {
             TextBlock weightTextBlock = new TextBlock
             {
                 Text = weight,
                 FontSize = 20,
                 Visibility = Visibility.Visible,
-                Background = Brushes.LightCoral,
+                Background = bg,
                 TextAlignment = TextAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center

@@ -1,4 +1,5 @@
-﻿using GoGraph.ViewElements;
+﻿using GoGraph.Graph.Edges;
+using GoGraph.ViewElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,6 @@ namespace GoGraph.Graph.Nodes
     public class Node
     {
         public string Name { get; set; }
-        public List<Node> Next { get; set; } = new List<Node>();
+        public Dictionary<Node, Edge> Next { get; set; } = new Dictionary<Node, Edge>();
     }
 }
