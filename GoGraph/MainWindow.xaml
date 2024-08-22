@@ -40,6 +40,7 @@
                     <MenuItem Header="Weightened Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Weightened}"/>
                     <MenuItem Header="Directed Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Directed}"/>
                     <MenuItem Header="Directed Weightened Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.DirectedWeightened}"/>
+                    <MenuItem Header="Web Graph (20x20)" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Web}"/>
                 </MenuItem>
                 <MenuItem Header="Open Project" Command="{Binding OpenCommand}" CommandParameter="{Binding ElementName=grid}"/>
                 <MenuItem Header="Save" IsEnabled="{Binding IsSaveAvailable, UpdateSourceTrigger=PropertyChanged}" Command="{Binding SaveCommand}"/>

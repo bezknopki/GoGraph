@@ -2,9 +2,13 @@
 {
     public class DirectedWeightenedGraphCreator : GraphCreator
     {
+        public DirectedWeightenedGraphCreator()
+        {
+            Susccessor = new WebGraphCreator();
+        }
         public override GraphBase Create(GraphTypes type)
             => type == GraphTypes.DirectedWeightened
             ? new DirectedWeightenedGraph()
-            : throw new ArgumentException();
+            : Susccessor.Create(type);
     }
 }

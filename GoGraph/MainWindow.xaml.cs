@@ -23,7 +23,10 @@ namespace GoGraph
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new GraphViewModel();
+            var dc = new GraphViewModel();
+            dc.Grid = grid;
+            DataContext = dc;
+            
         }
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e) => e.Handled = isNumbersOnly.IsMatch(e.Text);

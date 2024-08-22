@@ -16,6 +16,8 @@ using GoGraph.History;
 using GraphEngine.Algorithms.ShortestWay;
 using System.Collections.ObjectModel;
 using GraphEngine.Algorithms.MinimalSpannedTree;
+using GraphEngine.Algorithms.InformedSearch;
+//using System.Drawing;
 
 namespace GoGraph.ViewModel
 {
@@ -34,6 +36,9 @@ namespace GoGraph.ViewModel
         private RelayCommand _undoLastActionCommand;
         private RelayCommand _removeCommand;
 
+        private RelayCommand _closeCommand;
+        private RelayCommand _selectCommand;
+
         private List<Direction> _directions = new List<Direction> { Direction.FirstToSecond, Direction.SecondToFirst, Direction.Both };
 
         private Direction _selectedDirection = Direction.FirstToSecond;
@@ -43,6 +48,8 @@ namespace GoGraph.ViewModel
 
         private NodeView? _firstSelected;
         private NodeView? _secondSelected;
+
+        public Grid Grid = null;
 
         public GraphViewModel()
         {
@@ -78,6 +85,18 @@ namespace GoGraph.ViewModel
         }
 
         #region COMMANDS
+        public RelayCommand CloseCommand
+        {
+            get => _closeCommand ??= new RelayCommand(obj => CloseNode(obj));
+            set { _closeCommand = value; }
+        }
+
+        public RelayCommand SelectCommand
+        {
+            get => _selectCommand ??= new RelayCommand(obj => SelectFromOrDst(obj));
+            set { _selectCommand = value; }
+        }
+
         public RelayCommand RemoveCommand
         {
             get => _removeCommand ??= new RelayCommand(obj => Remove(obj));
@@ -126,6 +145,51 @@ namespace GoGraph.ViewModel
             set { _addNodeCommand = value; }
         }
         #endregion
+
+        private void CloseNode(object obj)
+        {
+            Grid grid = (Grid)obj;
+            Border selected = null;
+            foreach (var el in grid.Children)
+                if (el is Border br && br.IsMouseDirectlyOver)
+                {
+                    selected = br;
+                    break;
+                }
+            int i = Grid.GetRow(selected);
+            int j = Grid.GetColumn(selected);
+
+            Node node = _model.Graph.Nodes[i * j];
+            foreach (var next in node.Next)
+                next.Key.Next.Remove(node);
+            node.Next.Clear();
+            selected.Background = Brushes.Crimson;
+        }
+
+        WebNode _from = null;
+        WebNode _dst = null;
+
+        private void SelectFromOrDst(object obj)
+        {
+            Grid grid = (Grid)obj;
+            Border selected = null;
+            foreach (var el in grid.Children)
+                if (el is Border br && br.IsMouseDirectlyOver)
+                {
+                    selected = br;
+                    break;
+                }
+            int i = Grid.GetRow(selected);
+            int j = Grid.GetColumn(selected);
+
+            WebNode node = (WebNode)_model.Graph.Nodes[i * j];
+            if (_from == null)
+                _from = node;
+            else
+                _dst = node;
+
+            selected.Background = Brushes.Blue;
+        }
 
         private void Remove(object obj)
         {
@@ -187,6 +251,13 @@ namespace GoGraph.ViewModel
             AnimationHelper.Model = _model;
             AnimationHelper.Grid = (Grid)obj;
             Prim bfs = new();
+            AStar astar = new AStar();
+
+            var res = astar.Start(_from, _dst);
+            foreach (var item in res)
+            {
+                _model.NodesToViews[item].Background = Brushes.ForestGreen;
+            }
 
             //bfs.HighlightNodeEvent += AnimationHelper.HighlightNode;
             //bfs.HighlightEdgeEvent += AnimationHelper.HighlightEdge;
@@ -194,15 +265,15 @@ namespace GoGraph.ViewModel
             //string res = await bfs.Start(_model.Graph.Nodes.First());
             //MessageBox.Show(res);
 
-            var res = bfs.Start(_model.Graph.Nodes.First(), _model.Graph.Nodes.Count);
-            foreach(var e in _model.Graph.Edges)
-            {
-                if (!res.Contains(e))
-                {
-                    _model.EdgesToViews[e].Edge.Opacity = 0.3;
-                    _model.EdgesToViews[e].Weight.Opacity = 0.3;
-                }
-            }
+            //var res = bfs.Start(_model.Graph.Nodes.First(), _model.Graph.Nodes.Count);
+            //foreach (var e in _model.Graph.Edges)
+            //{
+            //    if (!res.Contains(e))
+            //    {
+            //        _model.EdgesToViews[e].Edge.Opacity = 0.3;
+            //        _model.EdgesToViews[e].Weight.Opacity = 0.3;
+            //    }
+            //}
             //await AnimationHelper.WalkThrough(w);
             //AnimationHelper.Reset();
             //Results.Add(w.ToString());
@@ -276,6 +347,103 @@ namespace GoGraph.ViewModel
         {
             var type = (GraphTypes)obj;
             _model.Graph = _creator.Create(type);
+
+            if (type == GraphTypes.Web)
+            {
+                Grid grid = new Grid();
+                for (int i = 0; i < 20; i++)
+                {
+                    grid.RowDefinitions.Add(new RowDefinition());
+                    grid.ColumnDefinitions.Add(new ColumnDefinition());
+                    grid.Background = Brushes.Lime;
+                }
+
+                WebNode[][] nodeMatrix = new WebNode[20][];
+                for (int i = 0; i < 20; i++)
+                {
+                    nodeMatrix[i] = new WebNode[20];
+                }
+
+                for (int i = 0; i < 20; i++)
+                    for (int j = 0; j < 20; j++)
+                    {
+                        Border border = new Border()
+                        {
+                            BorderThickness = new Thickness(1),
+                            Background = Brushes.FloralWhite,
+                            BorderBrush = Brushes.Black
+                        };
+
+                        grid.Children.Add(border);
+
+                        Grid.SetColumn(border, i);
+                        Grid.SetRow(border, j);
+
+                        nodeMatrix[i][j] = new WebNode { Name = NodeNameSequence.Next.ToString(), X = i, Y = j };
+                        _model.NodesToViews.Add(nodeMatrix[i][j], border);
+                    }
+
+                MouseBinding lmb = new MouseBinding();
+                lmb.MouseAction = MouseAction.LeftClick;
+                lmb.Command = CloseCommand;
+                lmb.CommandParameter = grid;
+                grid.InputBindings.Add(lmb);
+
+                MouseBinding rmb = new MouseBinding();
+                rmb.MouseAction = MouseAction.RightClick;
+                rmb.Command = SelectCommand;
+                rmb.CommandParameter = grid;
+                grid.InputBindings.Add(rmb);
+                grid.SizeChanged += (s, e) => 
+                {
+                    Grid g = (Grid)s;
+                    double minSide = Math.Min(e.NewSize.Width, e.NewSize.Height);
+                    g.Width = minSide;
+                    g.Height = minSide;
+                };
+
+                Grid.Children.Add(grid);
+                Grid.InputBindings.Clear();
+                
+                //Grid.IsEnabled = false;
+
+                for (int i = 0; i < 20; i++)
+                    for (int j = 0; j < 20; j++)
+                    {
+                        if (i > 0)
+                        {
+                            nodeMatrix[i][j].Next.Add(nodeMatrix[i - 1][j], new Edge { Weight = 1, IsWeightened = true });
+
+                            if (j != 19)
+                                nodeMatrix[i][j].Next.Add(nodeMatrix[i - 1][j + 1], new Edge { Weight = 1, IsWeightened = true });
+
+                            if (j > 0)
+                                nodeMatrix[i][j].Next.Add(nodeMatrix[i - 1][j - 1], new Edge { Weight = 1, IsWeightened = true });
+                        }
+
+                        if (j > 0)
+                            nodeMatrix[i][j].Next.Add(nodeMatrix[i][j - 1], new Edge { Weight = 1, IsWeightened = true });
+
+                        if (j != 19)
+                            nodeMatrix[i][j].Next.Add(nodeMatrix[i][j + 1], new Edge { Weight = 1, IsWeightened = true });
+
+                        if (i != 19)
+                        {
+                            if (j > 0)
+                                nodeMatrix[i][j].Next.Add(nodeMatrix[i + 1][j - 1], new Edge { Weight = 1, IsWeightened = true });
+
+                            nodeMatrix[i][j].Next.Add(nodeMatrix[i + 1][j], new Edge { Weight = 1, IsWeightened = true });
+
+                            if (j != 19)
+                                nodeMatrix[i][j].Next.Add(nodeMatrix[i + 1][j + 1], new Edge { Weight = 1, IsWeightened = true });
+                        }
+
+                        _model.Graph.Nodes.Add(nodeMatrix[i][j]);
+                    }
+
+                Grid = grid;
+            }
+
             OnPropertyChanged(nameof(IsDirected));
             OnPropertyChanged(nameof(IsWeightened));
             OnPropertyChanged(nameof(IsSaveAsAvailable));

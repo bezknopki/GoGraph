@@ -5,6 +5,7 @@
         Simple,
         Weightened,
         Directed,
-        DirectedWeightened
+        DirectedWeightened,
+        Web
     }
 }
