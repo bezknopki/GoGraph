@@ -1,4 +1,4 @@
-﻿using GoGraph.Graph.Nodes;
+﻿using GraphEngine.Graph.Nodes;
 
 namespace GoGraph.Serializer
 {

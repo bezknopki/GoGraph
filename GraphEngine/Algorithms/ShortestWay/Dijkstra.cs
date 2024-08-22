@@ -1,13 +1,8 @@
-﻿using GoGraph.Graph.Graphs;
-using GoGraph.Graph.Nodes;
-using GoGraph.ViewElements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using GraphEngine.Graph.Graphs;
+using GraphEngine.Graph.Nodes;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace GoGraph.Algorithms.ShortestWay
+namespace GraphEngine.Algorithms.ShortestWay
 {
     public class Dijkstra
     {
@@ -31,7 +26,7 @@ namespace GoGraph.Algorithms.ShortestWay
         {
             Node cur = GetLightestNode();
             Way curWay = GetWayTo(cur);
-            AnimationHelper.HighlightNode(cur);
+            //AnimationHelper.HighlightNode(cur);
             
             double curMark = _marks[cur];
 
@@ -41,7 +36,7 @@ namespace GoGraph.Algorithms.ShortestWay
                 Way nextWay = GetWayTo(node.Key);
 
                 double nMark = node.Value.Weight + curMark;
-                AnimationHelper.HighlightEdge(node.Value);
+                //AnimationHelper.HighlightEdge(node.Value);
                 await Task.Delay(50);
                 if (nMark < _marks[node.Key])
                 {
@@ -49,7 +44,7 @@ namespace GoGraph.Algorithms.ShortestWay
                     nextWay.Edges.Clear();
                     nextWay.Edges.AddRange(curWay.Edges);
                     nextWay.Edges.Add(node.Value);
-                    AnimationHelper.ShowMark(node.Key, nMark);
+                    //AnimationHelper.ShowMark(node.Key, nMark);
                     await Task.Delay(250);
                 }
             }
@@ -67,9 +62,8 @@ namespace GoGraph.Algorithms.ShortestWay
             foreach (var node in graph.Nodes)
                 _ways.Add(new Way(from, node));
 
-            AnimationHelper.ShowMark(from, 0);
+            //AnimationHelper.ShowMark(from, 0);
         }
-
 
         private Way GetWayTo(Node node) => _ways.First(x => x.To == node);
 

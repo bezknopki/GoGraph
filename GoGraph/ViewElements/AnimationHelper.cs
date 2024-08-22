@@ -1,13 +1,7 @@
-﻿using GoGraph.Algorithms.ShortestWay;
-using GoGraph.Graph.Edges;
-using GoGraph.Graph.Nodes;
+﻿using GraphEngine.Algorithms.ShortestWay;
+using GraphEngine.Graph.Edges;
+using GraphEngine.Graph.Nodes;
 using GoGraph.Model;
-using GoGraph.Serializer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;

@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GoGraph.Graph.Nodes;
-using GoGraph.Graph.Edges;
-using GoGraph.Graph.Graphs;
+﻿using GraphEngine.Graph.Edges;
+using GraphEngine.Graph.Graphs;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Net;
-using System.Text.Json.Serialization;
-using System.Windows.Shapes;
 using GoGraph.ViewElements;
 
 namespace GoGraph.Model

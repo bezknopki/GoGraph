@@ -1,12 +1,7 @@
-﻿using GoGraph.Graph.Nodes;
-using GoGraph.ViewElements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using GraphEngine.Graph.Nodes;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace GoGraph.Algorithms.UninformedSearch
+namespace GraphEngine.Algorithms.UninformedSearch
 {
     public class DepthFirstSearch
     {
@@ -23,7 +18,7 @@ namespace GoGraph.Algorithms.UninformedSearch
             while (_nodes.Count > 0)
             {
                 Node cur = _nodes.Pop();
-                AnimationHelper.HighlightNode(cur);
+                //AnimationHelper.HighlightNode(cur);
 
                 result.Append($"{cur.Name}, ");
 

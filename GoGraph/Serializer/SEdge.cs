@@ -1,5 +1,5 @@
-﻿using GoGraph.Graph.Edges;
-using GoGraph.Graph.Nodes;
+﻿using GraphEngine.Graph.Edges;
+using GraphEngine.Graph.Nodes;
 
 namespace GoGraph.Serializer
 {

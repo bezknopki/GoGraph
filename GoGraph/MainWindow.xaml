@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:GoGraph" xmlns:gt="clr-namespace:GoGraph.Graph.Graphs.GraphCreator"
+        xmlns:local="clr-namespace:GoGraph"
+        xmlns:gt="clr-namespace:GraphEngine.Graph.Graphs.GraphCreator;assembly=GraphEngine"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="GoGraph" Height="450" Width="800">
@@ -32,7 +33,7 @@
                 </i:Interaction.Triggers>
             </Grid>
         </Border>
-        <Menu Height ="20" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0">
+        <Menu Height ="20" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
             <MenuItem Header="File">
                 <MenuItem Header="New Project">
                     <MenuItem Header="Simple Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Simple}"/>

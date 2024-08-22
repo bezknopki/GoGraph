@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GoGraph.Graph.Edges;
-using System.Windows.Shapes;
-using System.Windows.Media;
+﻿using System.Windows;
+using GraphEngine.Graph.Edges;
 using System.Windows.Controls;
 
 namespace GoGraph.ViewElements

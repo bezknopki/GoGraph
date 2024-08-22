@@ -1,12 +1,8 @@
-﻿using GoGraph.Graph.Edges;
-using GoGraph.Graph.Nodes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using GraphEngine.Graph.Edges;
+using GraphEngine.Graph.Nodes;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace GoGraph.Algorithms.ShortestWay
+namespace GraphEngine.Algorithms.ShortestWay
 {
     public class Way
     {

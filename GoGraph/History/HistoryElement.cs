@@ -1,11 +1,6 @@
-﻿using GoGraph.Graph.Edges;
-using GoGraph.Graph.Nodes;
+﻿using GraphEngine.Graph.Edges;
+using GraphEngine.Graph.Nodes;
 using GoGraph.ViewElements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace GoGraph.History

@@ -1,12 +1,7 @@
-﻿using GoGraph.Graph.Nodes;
-using GoGraph.ViewElements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using GraphEngine.Graph.Nodes;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace GoGraph.Algorithms.UninformedSearch
+namespace GraphEngine.Algorithms.UninformedSearch
 {
     public class BreadthFirstSearch : AlgorithmBase
     {       

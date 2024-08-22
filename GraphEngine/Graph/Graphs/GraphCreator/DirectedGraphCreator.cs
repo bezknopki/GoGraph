@@ -1,4 +1,4 @@
-﻿namespace GoGraph.Graph.Graphs.GraphCreator
+﻿namespace GraphEngine.Graph.Graphs.GraphCreator
 {
     public class DirectedGraphCreator : GraphCreator
     {

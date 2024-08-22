@@ -1,7 +1,7 @@
-﻿using GoGraph.Graph.Edges;
-using GoGraph.Graph.Graphs;
-using GoGraph.Graph.Graphs.GraphCreator;
-using GoGraph.Graph.Nodes;
+﻿using GraphEngine.Graph.Edges;
+using GraphEngine.Graph.Graphs;
+using GraphEngine.Graph.Graphs.GraphCreator;
+using GraphEngine.Graph.Nodes;
 using GoGraph.Model;
 using GoGraph.ViewElements;
 

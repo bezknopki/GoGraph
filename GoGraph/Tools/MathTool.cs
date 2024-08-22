@@ -1,9 +1,4 @@
-﻿using GoGraph.Graph.Nodes;
-using GoGraph.ViewElements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using GoGraph.ViewElements;
 using System.Windows;
 
 namespace GoGraph.Tools

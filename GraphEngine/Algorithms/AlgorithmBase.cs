@@ -1,12 +1,7 @@
-﻿using GoGraph.Graph.Edges;
-using GoGraph.Graph.Nodes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GraphEngine.Graph.Edges;
+using GraphEngine.Graph.Nodes;
 
-namespace GoGraph.Algorithms
+namespace GraphEngine.Algorithms
 {
     public abstract class AlgorithmBase
     {

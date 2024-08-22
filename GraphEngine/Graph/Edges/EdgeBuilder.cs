@@ -1,12 +1,6 @@
-﻿using GoGraph.Graph.Nodes;
-using GoGraph.ViewElements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GraphEngine.Graph.Nodes;
 
-namespace GoGraph.Graph.Edges
+namespace GraphEngine.Graph.Edges
 {
     public class EdgeBuilder
     {
