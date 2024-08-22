@@ -1,17 +1,15 @@
 ﻿using GraphEngine.Graph.Nodes;
-using System.Text;
 
 namespace GraphEngine.Algorithms.UninformedSearch
 {
     public class BreadthFirstSearch : AlgorithmBase
-    {       
+    {
         private Queue<Node> _nodes = new Queue<Node>();
-
         private HashSet<Node> _visited = new HashSet<Node>();
 
-        public async Task<string> Start(Node startNode)
+        public async Task<LinkedList<Node>> Start(Node startNode)
         {
-            StringBuilder result = new StringBuilder();
+            LinkedList<Node> result = new LinkedList<Node>();
             _nodes.Enqueue(startNode);
 
             while (_nodes.Count > 0)
@@ -20,7 +18,7 @@ namespace GraphEngine.Algorithms.UninformedSearch
                 _visited.Add(cur);
 
                 HighlightNode(cur);
-                result.Append($"{cur.Name} -> ");
+                result.AddLast(cur);
 
                 foreach (var nextNode in cur.Next.Keys)
                     if (!_visited.Contains(nextNode))
@@ -28,10 +26,10 @@ namespace GraphEngine.Algorithms.UninformedSearch
                         HighlightEdge(cur.Next[nextNode]);
                         _nodes.Enqueue(nextNode);
                         await Task.Delay(_delay);
-                    }              
+                    }
             }
 
-            return result.ToString();
+            return result;
         }
     }
 }

@@ -1,32 +1,41 @@
 ﻿using GraphEngine.Graph.Graphs;
 using GraphEngine.Graph.Nodes;
-using System.Text;
 
 namespace GraphEngine.Algorithms.ShortestWay
 {
-    public class Dijkstra
+    public class Dijkstra : ShortestWay
     {
         private Dictionary<Node, double> _marks = new Dictionary<Node, double>();
         private HashSet<Node> _visited = new HashSet<Node>();
         private List<Way> _ways = new List<Way>();
 
-        public async Task<Way> FindShortestWay(GraphBase graph, Node from, Node to)
+        public async Task<Way> FindShortestWayAsync(GraphBase graph, Node from, Node to)
         {
             if (!graph.IsWeightened) throw new ArgumentException();
             Init(graph, from);
 
-            StringBuilder res = new StringBuilder();
             while (_visited.Count < graph.Nodes.Count)
-                await Step(graph);
+                await Step();
 
             return GetWayTo(to);
         }
 
-        private async Task Step(GraphBase graph)
+        public Way FindShortestWay(GraphBase graph, Node from, Node to)
+        {
+            if (!graph.IsWeightened) throw new ArgumentException();
+            Init(graph, from);
+
+            while (_visited.Count < graph.Nodes.Count)
+                Step();
+
+            return GetWayTo(to);
+        }
+
+        private async Task Step()
         {
             Node cur = GetLightestNode();
             Way curWay = GetWayTo(cur);
-            //AnimationHelper.HighlightNode(cur);
+            HighlightNode(cur);
             
             double curMark = _marks[cur];
 
@@ -36,7 +45,7 @@ namespace GraphEngine.Algorithms.ShortestWay
                 Way nextWay = GetWayTo(node.Key);
 
                 double nMark = node.Value.Weight + curMark;
-                //AnimationHelper.HighlightEdge(node.Value);
+                HighlightEdge(node.Value);
                 await Task.Delay(50);
                 if (nMark < _marks[node.Key])
                 {
@@ -44,7 +53,7 @@ namespace GraphEngine.Algorithms.ShortestWay
                     nextWay.Edges.Clear();
                     nextWay.Edges.AddRange(curWay.Edges);
                     nextWay.Edges.Add(node.Value);
-                    //AnimationHelper.ShowMark(node.Key, nMark);
+                    ShowMark(node.Key, nMark);
                     await Task.Delay(250);
                 }
             }

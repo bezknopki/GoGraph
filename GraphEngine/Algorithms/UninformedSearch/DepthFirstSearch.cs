@@ -1,39 +1,37 @@
-﻿using GraphEngine.Graph.Nodes;
-using System.Text;
+﻿using GraphEngine.Graph.Edges;
+using GraphEngine.Graph.Nodes;
 
 namespace GraphEngine.Algorithms.UninformedSearch
 {
-    public class DepthFirstSearch
+    public class DepthFirstSearch : AlgorithmBase
     {
-        const int _delay = 250;
-
         private HashSet<Node> _visited = new HashSet<Node>();
         private Stack<Node> _nodes = new Stack<Node>();
+        private LinkedList<Node> _result = new LinkedList<Node>();
 
-        public async Task<string> Start(Node startNode)
+        public async Task<LinkedList<Node>> Start(Node startNode)
         {
-            StringBuilder result = new StringBuilder();
-            _nodes.Push(startNode);
+            HighlightNode(startNode);
+            _visited.Add(startNode);
 
-            while (_nodes.Count > 0)
-            {
-                Node cur = _nodes.Pop();
-                //AnimationHelper.HighlightNode(cur);
+            foreach (var next in startNode.Next)
+                await Step(next.Key, next.Value);
 
-                result.Append($"{cur.Name}, ");
+            return _result;
+        }
 
-                foreach (var nextNode in cur.Next.Keys)
-                    if (!_visited.Contains(nextNode))
-                    {
-                        //AnimationHelper.HighlightEdgeBetweenNodes(cur, nextNode);
-                        _nodes.Push(nextNode);
-                        await Task.Delay(_delay);
-                    }
+        private async Task Step(Node node, Edge edge)
+        {
+            HighlightNode(node);
+            HighlightEdge(edge);
+            _visited.Add(node);
+            _result.AddLast(node);
 
-                _visited.Add(cur);
-            }
+            await Task.Delay(_delay);
 
-            return result.ToString();
+            foreach (var next in node.Next)
+                if (!_visited.Contains(next.Key))
+                    await Step(next.Key, next.Value);
         }
     }
 }
