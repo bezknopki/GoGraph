@@ -15,6 +15,7 @@ using GoGraph.Serializer;
 using GoGraph.History;
 using GraphEngine.Algorithms.ShortestWay;
 using System.Collections.ObjectModel;
+using GraphEngine.Algorithms.MinimalSpannedTree;
 
 namespace GoGraph.ViewModel
 {
@@ -91,7 +92,7 @@ namespace GoGraph.ViewModel
 
         public RelayCommand BeginSearchCommand
         {
-            get => _beginSearchCommand ??= new RelayCommand(obj => BeginSearch(obj));
+            get => _beginSearchCommand ??= new RelayCommand(obj => BeginSearch(obj), obj => obj is Grid);
             set { _beginSearchCommand = value; }
         }
 
@@ -185,18 +186,26 @@ namespace GoGraph.ViewModel
         {
             AnimationHelper.Model = _model;
             AnimationHelper.Grid = (Grid)obj;
-            Dijkstra bfs = new();
+            Prim bfs = new();
 
             //bfs.HighlightNodeEvent += AnimationHelper.HighlightNode;
-            //bfs.HighlightEdgeEvent += AnimationHelper.HighlightEdgeBetweenNodes;
+            //bfs.HighlightEdgeEvent += AnimationHelper.HighlightEdge;
 
             //string res = await bfs.Start(_model.Graph.Nodes.First());
             //MessageBox.Show(res);
 
-            Way w = await bfs.FindShortestWayAsync(_model.Graph, _model.Graph.Nodes.First(), _model.Graph.Nodes.First(x => x.Name == "5"));
-            await AnimationHelper.WalkThrough(w);
-            AnimationHelper.Reset();
-            Results.Add(w.ToString());
+            var res = bfs.Start(_model.Graph.Nodes.First(), _model.Graph.Nodes.Count);
+            foreach(var e in _model.Graph.Edges)
+            {
+                if (!res.Contains(e))
+                {
+                    _model.EdgesToViews[e].Edge.Opacity = 0.3;
+                    _model.EdgesToViews[e].Weight.Opacity = 0.3;
+                }
+            }
+            //await AnimationHelper.WalkThrough(w);
+            //AnimationHelper.Reset();
+            //Results.Add(w.ToString());
         }
 
         private void SaveAsProjectCommand()

@@ -20,10 +20,7 @@ namespace GoGraph.Serializer
             if (sfd.ShowDialog() == true)
             {
                 path = sfd.FileName;
-                if (File.Exists(path))
-                    File.Delete(path);
-                using FileStream fs = new FileStream(path, FileMode.OpenOrCreate);
-                _serializer.Serialize(fs, model);
+                SerializeXML(model, path);
             }
 
             return path;
@@ -31,6 +28,9 @@ namespace GoGraph.Serializer
 
         public static void SerializeXML(SerializebleGraphModel model, string path)
         {
+            if (File.Exists(path))
+                File.Delete(path);
+
             using FileStream fs = new FileStream(path, FileMode.OpenOrCreate);
             _serializer.Serialize(fs, model);
         }
