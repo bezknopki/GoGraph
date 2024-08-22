@@ -193,7 +193,7 @@ namespace GoGraph.ViewModel
             //string res = await bfs.Start(_model.Graph.Nodes.First());
             //MessageBox.Show(res);
 
-            Way w = await bfs.FindShortestWay(_model.Graph, _model.Graph.Nodes.First(), _model.Graph.Nodes.First(x => x.Name == "5"));
+            Way w = await bfs.FindShortestWayAsync(_model.Graph, _model.Graph.Nodes.First(), _model.Graph.Nodes.First(x => x.Name == "5"));
             await AnimationHelper.WalkThrough(w);
             AnimationHelper.Reset();
             Results.Add(w.ToString());
