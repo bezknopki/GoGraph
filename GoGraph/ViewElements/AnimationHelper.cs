@@ -5,6 +5,9 @@ using GoGraph.Model;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+//using System.Drawing;
+using GoGraph.Serializer;
+using System.Windows;
 
 namespace GoGraph.ViewElements
 {
@@ -59,8 +62,8 @@ namespace GoGraph.ViewElements
                 Fill = _highlightedBrush,
                 Height = 10,
                 Width = 10,
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Left,
-                VerticalAlignment = System.Windows.VerticalAlignment.Top
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top
             };
 
             Grid.Children.Add(walker);
@@ -88,6 +91,30 @@ namespace GoGraph.ViewElements
                 return (xf, xt) => xf < xt;
         }
 
+        public static async Task Walk(Point start, Point end, Ellipse walker)
+        {
+            double mLeft = start.X;
+            double mTop = start.Y;
+
+            double k = (end.Y - start.Y) / (end.X - start.X);
+
+            double walkX(double x) => start.X > end.X ? --x : ++x;
+            double offset = walker.Width / 2;
+
+            Func<double, double, bool> isFinished = GetFinishCondition(mLeft, end.X);
+
+            while (isFinished(mLeft, end.X))
+            {
+                walker.Margin = new Thickness(mLeft - offset, mTop - offset, 0, 0);
+
+                mLeft = walkX(mLeft);
+                mTop = start.Y + (mLeft - start.X) * k;
+
+                await Task.Delay(10);
+            }
+            await Task.Delay(50);
+        }
+
         private static async Task WalkByLine(Node from, Edge edge, Ellipse walker)
         {
             Line line = Model.EdgesToViews[edge].Edge;
@@ -97,26 +124,10 @@ namespace GoGraph.ViewElements
             double yFrom = edge.First == from ? line.Y1 : line.Y2;
             double yTo = edge.First == from ? line.Y2 : line.Y1;
 
-            double mLeft = xFrom;
-            double mTop = yFrom;
+            Point start = new Point(xFrom, yFrom);
+            Point end = new Point(xTo, yTo);
 
-            double k = (yTo - yFrom) / (xTo - xFrom);
-
-            double walkX(double x) => xFrom > xTo ? --x : ++x;
-            double offset = walker.Width / 2;
-
-            Func<double, double, bool> isFinished = GetFinishCondition(mLeft, xTo);
-
-            while (isFinished(mLeft, xTo))
-            {
-                walker.Margin = new System.Windows.Thickness(mLeft - offset, mTop - offset, 0, 0);
-
-                mLeft = walkX(mLeft);
-                mTop = yFrom + (mLeft - xFrom) * k;
-
-                await Task.Delay(10);
-            }
-            await Task.Delay(50);
+            await Walk(start, end, walker);
         }
 
         public static void Reset()

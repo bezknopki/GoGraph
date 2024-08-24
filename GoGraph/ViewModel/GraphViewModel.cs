@@ -17,6 +17,7 @@ using GraphEngine.Algorithms.ShortestWay;
 using System.Collections.ObjectModel;
 using GraphEngine.Algorithms.MinimalSpannedTree;
 using GraphEngine.Algorithms.InformedSearch;
+using System.Windows.Shapes;
 //using System.Drawing;
 
 namespace GoGraph.ViewModel
@@ -156,10 +157,10 @@ namespace GoGraph.ViewModel
                     selected = br;
                     break;
                 }
-            int i = Grid.GetRow(selected);
-            int j = Grid.GetColumn(selected);
+            int i = Grid.GetColumn(selected) * 20;
+            int j = Grid.GetRow(selected);
 
-            Node node = _model.Graph.Nodes[i * j];
+            Node node = _model.Graph.Nodes[i + j];
             foreach (var next in node.Next)
                 next.Key.Next.Remove(node);
             node.Next.Clear();
@@ -169,7 +170,9 @@ namespace GoGraph.ViewModel
         WebNode _from = null;
         WebNode _dst = null;
 
-        private void SelectFromOrDst(object obj)
+        Ellipse wlkr = null;
+
+        private async void SelectFromOrDst(object obj)
         {
             Grid grid = (Grid)obj;
             Border selected = null;
@@ -179,16 +182,52 @@ namespace GoGraph.ViewModel
                     selected = br;
                     break;
                 }
-            int i = Grid.GetRow(selected);
-            int j = Grid.GetColumn(selected);
+            int i = Grid.GetColumn(selected) * 20;
+            int j = Grid.GetRow(selected);
 
-            WebNode node = (WebNode)_model.Graph.Nodes[i * j];
+            WebNode node = (WebNode)_model.Graph.Nodes[i + j];
             if (_from == null)
+            {
                 _from = node;
+                Ellipse walker = new Ellipse
+                {
+                    Stroke = Brushes.ForestGreen,
+                    Fill = Brushes.ForestGreen,
+                    Height = 10,
+                    Width = 10,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top
+                };
+                walker.Margin = new Thickness(Grid.GetColumn(selected) * selected.ActualWidth + selected.ActualWidth / 2 - 5, 
+                    Grid.GetRow(selected) * selected.ActualHeight + selected.ActualHeight / 2 - 5, 0, 0);
+                Grid.SetColumnSpan(walker, 20);
+                Grid.SetRowSpan(walker, 20);
+                grid.Children.Add(walker);
+                
+                wlkr = walker;
+            }
             else
+            {
                 _dst = node;
+                AStar astar = new AStar();
 
-            selected.Background = Brushes.Blue;
+                var res = astar.Start(_from, _dst);
+                Point start = new Point(wlkr.Margin.Left, wlkr.Margin.Top);
+                
+                foreach (var item in res)
+                {
+                    double side = _model.NodesToViews[item].ActualWidth;
+                    int col = Grid.GetColumn(_model.NodesToViews[item]);
+                    int row = Grid.GetRow(_model.NodesToViews[item]);
+                    Point end = new Point(col * side + side / 2, row * side + side / 2);
+                    await AnimationHelper.Walk(start, end, wlkr);
+                    start = end;
+                }
+
+                _from = _dst;
+            }
+
+            //selected.Background = Brushes.Blue;
         }
 
         private void Remove(object obj)

@@ -1,9 +1,4 @@
 ﻿using GraphEngine.Graph.Nodes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GraphEngine.Algorithms.InformedSearch
 {
@@ -15,9 +10,9 @@ namespace GraphEngine.Algorithms.InformedSearch
         private Dictionary<WebNode, double> _estimatedDstToGoal = new Dictionary<WebNode, double>();
         private Dictionary<WebNode, WebNode> _parents = new Dictionary<WebNode, WebNode>();
 
-        public List<WebNode> Start(WebNode start, WebNode goal)
+        public LinkedList<WebNode> Start(WebNode start, WebNode goal)
         {
-            List<WebNode> path = new List<WebNode>();
+            LinkedList<WebNode> path = new LinkedList<WebNode>();
             _open.Enqueue(start);
             _dstFromStart.Add(start, 0);
 
@@ -29,10 +24,10 @@ namespace GraphEngine.Algorithms.InformedSearch
                 {
                     while (_parents.ContainsKey(cur))
                     {
-                        path.Add(cur);
+                        path.AddFirst(cur);
                         cur = _parents[cur];
                     }
-                    path.Add(cur);
+                    path.AddFirst(cur);
                     return path;
                 }
 
