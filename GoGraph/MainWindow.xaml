@@ -24,7 +24,7 @@
         <Border BorderThickness="1" Grid.Row="1" Grid.Column="0" BorderBrush="Black">
             <Grid Name="grid"  Background="LightCyan">
                 <Grid.InputBindings>
-                    <MouseBinding MouseAction="LeftClick" Command="{Binding AddNodeCommand}" CommandParameter="{Binding ElementName=grid}"/>
+                    <MouseBinding MouseAction="LeftClick" Command="{Binding AddNodeOrEdgeCommand}" CommandParameter="{Binding ElementName=grid}"/>
                 </Grid.InputBindings>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseRightButtonDown">

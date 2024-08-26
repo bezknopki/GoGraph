@@ -15,5 +15,14 @@ namespace GoGraph.History
         public List<Node> Nodes { get; set; } = new List<Node> { };
         public List<EdgeView> EdgeViews { get; set; } = new List<EdgeView> { };
         public List<NodeView> NodeViews { get; set; } = new List<NodeView> { };
+
+        public void MergeWith(HistoryElement he)
+        {
+            Elements.AddRange(he.Elements);
+            Edges.AddRange(he.Edges);
+            Nodes.AddRange(he.Nodes);
+            EdgeViews.AddRange(he.EdgeViews);
+            NodeViews.AddRange(he.NodeViews);
+        }
     }
 }

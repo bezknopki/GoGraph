@@ -27,7 +27,7 @@ namespace GoGraphTests
 
                 NodeViewBuilder nvb = new NodeViewBuilder();
                 NodeView nv = nvb
-                    .SetPosition(new Point(r.Next(0, 100), r.Next(0, 100)))
+                    .SetPosition(new Point(r.Next(100, 200), r.Next(100, 200)))
                     .SetName(i.ToString())
                     .Build();
 

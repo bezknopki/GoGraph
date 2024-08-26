@@ -13,12 +13,11 @@ using GraphEngine.Graph.Edges;
 using GraphEngine.Graph.Graphs.GraphCreator;
 using GoGraph.Serializer;
 using GoGraph.History;
-using GraphEngine.Algorithms.ShortestWay;
 using System.Collections.ObjectModel;
 using GraphEngine.Algorithms.MinimalSpannedTree;
 using GraphEngine.Algorithms.InformedSearch;
 using System.Windows.Shapes;
-//using System.Drawing;
+using System.Xml.Linq;
 
 namespace GoGraph.ViewModel
 {
@@ -140,12 +139,56 @@ namespace GoGraph.ViewModel
             set { _createGraphCommand = value; }
         }
 
-        public RelayCommand AddNodeCommand
+        public RelayCommand AddNodeOrEdgeCommand
         {
             get => _addNodeCommand ??= new RelayCommand(obj => AddNodeOrEdge(obj), obj => obj is Grid && _model.Graph != null);
             set { _addNodeCommand = value; }
         }
         #endregion
+
+        public void SetModel(Grid grid, GraphModel model)
+        {
+            if (model == null) return;
+
+            _model = model;
+            grid.Children.Clear();
+
+            foreach (var view in model.EdgeViews)
+            {
+                grid.Children.Add(view.Edge);
+
+                if (view.Arrows != null)
+                    foreach (var arrow in view.Arrows)
+                        grid.Children.Add(arrow);
+
+                if (view.Weight != null)
+                    grid.Children.Add(view.Weight);
+            }
+
+            foreach (var view in model.NodeViews)
+            {
+                grid.Children.Add(view.Node);
+                grid.Children.Add(view.Name);
+            }
+
+            NodeNameSequence.SetStart(model.Graph.Nodes.Max(x => int.Parse(x.Name)));
+            HistoryManager.Model = model;
+        }
+
+        private void UndoLastAction(object obj)
+        {
+            if (obj is Grid grid)
+            {
+                (ActionType type, List<UIElement> elements) = HistoryManager.Undo();
+
+                if (type == ActionType.Add)
+                    foreach (var element in elements)
+                        grid.Children.Remove(element);
+                else
+                    foreach (var element in elements)
+                        grid.Children.Add(element);
+            }
+        }
 
         private void CloseNode(object obj)
         {
@@ -171,7 +214,7 @@ namespace GoGraph.ViewModel
         WebNode _dst = null;
 
         Ellipse wlkr = null;
-
+        //TODO: ref
         private async void SelectFromOrDst(object obj)
         {
             Grid grid = (Grid)obj;
@@ -198,12 +241,12 @@ namespace GoGraph.ViewModel
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Top
                 };
-                walker.Margin = new Thickness(Grid.GetColumn(selected) * selected.ActualWidth + selected.ActualWidth / 2 - 5, 
+                walker.Margin = new Thickness(Grid.GetColumn(selected) * selected.ActualWidth + selected.ActualWidth / 2 - 5,
                     Grid.GetRow(selected) * selected.ActualHeight + selected.ActualHeight / 2 - 5, 0, 0);
                 Grid.SetColumnSpan(walker, 20);
                 Grid.SetRowSpan(walker, 20);
                 grid.Children.Add(walker);
-                
+
                 wlkr = walker;
             }
             else
@@ -213,7 +256,7 @@ namespace GoGraph.ViewModel
 
                 var res = astar.Start(_from, _dst);
                 Point start = new Point(wlkr.Margin.Left, wlkr.Margin.Top);
-                
+
                 foreach (var item in res)
                 {
                     double side = _model.NodesToViews[item].ActualWidth;
@@ -232,7 +275,6 @@ namespace GoGraph.ViewModel
 
         private void Remove(object obj)
         {
-            //TODO: add history remove
             if (obj is Grid grid)
             {
                 (bool isMouseOverEdge, EdgeView? edgeView) = IsMouseOverEdge(grid);
@@ -254,13 +296,19 @@ namespace GoGraph.ViewModel
 
             List<Edge> toRemove = new List<Edge>();
             foreach (var edge in _model.Graph.Edges)
-                if (edge.First == associatedNode || edge.Second == associatedNode)
+                if ((edge.First == associatedNode || edge.Second == associatedNode) && !toRemove.Contains(edge))
                     toRemove.Add(edge);
 
             foreach (var e in toRemove)
                 RemoveEdge(grid, _model.EdgesToViews[e]);
 
+            _model.Graph.Nodes.Remove(associatedNode);
+            _model.NodeViews.Remove(nodeView);
+
             UnselectNode(nodeView);
+
+            HistoryManager.Push(ActionType.Remove, nodeView, nodeView.Node, nodeView.Name, associatedNode);
+            HistoryManager.Merge(ActionType.Remove, toRemove.Count + 1);
         }
 
         private void RemoveEdge(Grid grid, EdgeView edgeView)
@@ -274,7 +322,6 @@ namespace GoGraph.ViewModel
                     grid.Children.Remove(arr);
 
             Edge associatedEdge = _model.EdgesToViews.First(x => x.Value == edgeView).Key;
-            _model.Graph.Edges.Remove(associatedEdge);
 
             if (associatedEdge.First.Next.ContainsKey(associatedEdge.Second))
                 associatedEdge.First.Next.Remove(associatedEdge.Second);
@@ -282,7 +329,11 @@ namespace GoGraph.ViewModel
             if (associatedEdge.Second.Next.ContainsKey(associatedEdge.First))
                 associatedEdge.Second.Next.Remove(associatedEdge.First);
 
+            _model.Graph.Edges.Remove(associatedEdge);
             _model.EdgesToViews.Remove(associatedEdge);
+            _model.EdgeViews.Remove(edgeView);
+
+            HistoryManager.Push(ActionType.Remove, associatedEdge, edgeView.Edge, edgeView, edgeView.Arrows, edgeView.Weight);
         }
 
         private async void BeginSearch(object obj)
@@ -343,45 +394,6 @@ namespace GoGraph.ViewModel
             }
         }
 
-        private void SetModel(Grid grid, GraphModel model)
-        {
-            if (model == null) return;
-
-            _model = model;
-            grid.Children.Clear();
-
-            foreach (var view in model.EdgeViews)
-            {
-                grid.Children.Add(view.Edge);
-
-                if (view.Arrows != null)
-                    foreach (var arrow in view.Arrows)
-                        grid.Children.Add(arrow);
-
-                if (view.Weight != null)
-                    grid.Children.Add(view.Weight);
-            }
-
-            foreach (var view in model.NodeViews)
-            {
-                grid.Children.Add(view.Node);
-                grid.Children.Add(view.Name);
-            }
-
-            NodeNameSequence.SetStart(model.Graph.Nodes.Max(x => int.Parse(x.Name)));
-            HistoryManager.Model = model;
-        }
-
-        private void UndoLastAction(object obj)
-        {
-            if (obj is Grid grid)
-            {
-                var elements = HistoryManager.Undo();
-                foreach (var element in elements)
-                    grid.Children.Remove(element);
-            }
-        }
-
         private void CreateGraph(object obj)
         {
             var type = (GraphTypes)obj;
@@ -433,7 +445,7 @@ namespace GoGraph.ViewModel
                 rmb.Command = SelectCommand;
                 rmb.CommandParameter = grid;
                 grid.InputBindings.Add(rmb);
-                grid.SizeChanged += (s, e) => 
+                grid.SizeChanged += (s, e) =>
                 {
                     Grid g = (Grid)s;
                     double minSide = Math.Min(e.NewSize.Width, e.NewSize.Height);
@@ -443,7 +455,7 @@ namespace GoGraph.ViewModel
 
                 Grid.Children.Add(grid);
                 Grid.InputBindings.Clear();
-                
+
                 //Grid.IsEnabled = false;
 
                 for (int i = 0; i < 20; i++)
@@ -591,16 +603,7 @@ namespace GoGraph.ViewModel
                 sNode.Next.Add(fNode, edge);
             }
 
-            HistoryElement he = new HistoryElement();
-            he.ActionType = ActionType.Add;
-            he.Edges.Add(edge);
-            he.EdgeViews.Add(edgeView);
-            he.Elements.Add(edgeView.Edge);
-            if (edgeView.Weight != null)
-                he.Elements.Add(edgeView.Weight);
-            if (edgeView.Arrows != null)
-                he.Elements.AddRange(edgeView.Arrows);
-            HistoryManager.Push(he);
+            HistoryManager.Push(ActionType.Add, edge, edgeView, edgeView.Edge, edgeView.Weight, edgeView.Arrows);
 
             _model.EdgeViews.Add(edgeView);
             _model.EdgesToViews.Add(edge, edgeView);
@@ -621,9 +624,9 @@ namespace GoGraph.ViewModel
 
         private void AddNode(Grid grid)
         {
-            string name = NodeNameSequence.Next.ToString();
-
             Point curPos = Mouse.GetPosition(grid);
+
+            string name = NodeNameSequence.Next.ToString();
             NodeViewBuilder builder = new NodeViewBuilder();
             builder.SetPosition(curPos)
                    .SetName(name);
@@ -637,13 +640,7 @@ namespace GoGraph.ViewModel
                 Name = name
             };
 
-            HistoryElement he = new HistoryElement();
-            he.ActionType = ActionType.Add;
-            he.Nodes.Add(newNode);
-            he.NodeViews.Add(view);
-            he.Elements.Add(view.Name);
-            he.Elements.Add(view.Node);
-            HistoryManager.Push(he);
+            HistoryManager.Push(ActionType.Add, newNode, view, view.Node, view.Name);
 
             _model.Graph.Nodes.Add(newNode);
             _model.NodeViews.Add(view);
