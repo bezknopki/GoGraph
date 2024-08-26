@@ -39,16 +39,16 @@ namespace GoGraph.Serializer
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = _filter;
-            SerializebleGraphModel? model = null;
+            GraphModel? model = null;
             string path = string.Empty;
 
             if (ofd.ShowDialog() == true)
             {
                 path = ofd.FileName;
-                DeserializeXML(path);
+                model = DeserializeXML(path);
             }
 
-            return (path, model?.ToGraphModel());
+            return (path, model);
         }
 
         public static GraphModel DeserializeXML(string path)
