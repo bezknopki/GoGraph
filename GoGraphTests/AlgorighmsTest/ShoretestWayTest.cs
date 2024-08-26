@@ -5,12 +5,12 @@ using GraphEngine.Graph.Nodes;
 
 namespace GoGraphTests.AlgorighmsTest
 {
-    public class DijkstraTest
+    public class ShoretestWayTest
     {
         [StaFact]
-        public void DijkstraResultTest()
+        public void DijkstraTest()
         {
-            string path = Path.Combine("..\\..\\..\\TestProjects", "dijkstraWikiTest.xml");
+            string path = Path.Combine(TestHelper.ProjectsDirectory, "dijkstraWikiTest.xml");
             GraphModel model = ProjectSerializer.DeserializeXML(path);
             Dijkstra dijkstra = new Dijkstra();
 

@@ -14,6 +14,7 @@ namespace GraphEngine.Algorithms.UninformedSearch
             HighlightNode(startNode);
             _visited.Add(startNode);
 
+            _result.AddFirst(startNode);
             foreach (var next in startNode.Next)
                 await Step(next.Key, next.Value);
 

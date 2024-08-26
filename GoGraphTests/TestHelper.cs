@@ -9,6 +9,8 @@ namespace GoGraphTests
 {
     public static class TestHelper
     {
+        public static string ProjectsDirectory = "..\\..\\..\\TestProjects";
+
         public static GraphModel MakeTestModel()
         {
             GraphModel model = new GraphModel();
