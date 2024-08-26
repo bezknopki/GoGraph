@@ -5,7 +5,9 @@ VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoGraph", "GoGraph\GoGraph.csproj", "{03346AF5-F76A-40CB-B8CE-27C95F32407B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphEngine", "GraphEngine\GraphEngine.csproj", "{6DD2F6E9-C62C-4B9A-999B-15456E6E448B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphEngine", "GraphEngine\GraphEngine.csproj", "{6DD2F6E9-C62C-4B9A-999B-15456E6E448B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoGraphTests", "GoGraphTests\GoGraphTests.csproj", "{DC62E0D6-B60F-4F23-AC8A-1DF4EACEA8EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{6DD2F6E9-C62C-4B9A-999B-15456E6E448B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DD2F6E9-C62C-4B9A-999B-15456E6E448B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DD2F6E9-C62C-4B9A-999B-15456E6E448B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC62E0D6-B60F-4F23-AC8A-1DF4EACEA8EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC62E0D6-B60F-4F23-AC8A-1DF4EACEA8EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC62E0D6-B60F-4F23-AC8A-1DF4EACEA8EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC62E0D6-B60F-4F23-AC8A-1DF4EACEA8EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -45,15 +45,24 @@ namespace GoGraph.Serializer
             if (ofd.ShowDialog() == true)
             {
                 path = ofd.FileName;
-                using (Stream reader = new FileStream(path, FileMode.Open))
-                    try
-                    {
-                        model = (SerializebleGraphModel)_serializer.Deserialize(reader);
-                    }
-                    catch { }
+                DeserializeXML(path);
             }
 
             return (path, model?.ToGraphModel());
+        }
+
+        public static GraphModel DeserializeXML(string path)
+        {
+            SerializebleGraphModel? model = null;
+
+            using (Stream reader = new FileStream(path, FileMode.Open))
+                try
+                {
+                    model = (SerializebleGraphModel)_serializer.Deserialize(reader);
+                }
+                catch { }
+
+            return model.ToGraphModel();
         }
     }
 }
