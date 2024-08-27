@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoGraph", "GoGraph\GoGraph.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphEngine", "GraphEngine\GraphEngine.csproj", "{6DD2F6E9-C62C-4B9A-999B-15456E6E448B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoGraphTests", "GoGraphTests\GoGraphTests.csproj", "{DC62E0D6-B60F-4F23-AC8A-1DF4EACEA8EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoGraphTests", "GoGraphTests\GoGraphTests.csproj", "{DC62E0D6-B60F-4F23-AC8A-1DF4EACEA8EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialogWindow", "DialogWindow\DialogWindow.csproj", "{167CAEAD-03C2-4A51-8389-82E2BE11E4D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{DC62E0D6-B60F-4F23-AC8A-1DF4EACEA8EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC62E0D6-B60F-4F23-AC8A-1DF4EACEA8EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC62E0D6-B60F-4F23-AC8A-1DF4EACEA8EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{167CAEAD-03C2-4A51-8389-82E2BE11E4D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{167CAEAD-03C2-4A51-8389-82E2BE11E4D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{167CAEAD-03C2-4A51-8389-82E2BE11E4D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{167CAEAD-03C2-4A51-8389-82E2BE11E4D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

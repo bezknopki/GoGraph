@@ -11,16 +11,17 @@ namespace GoGraphTests.ViewTests
         const string newNodeName = "20";
         const string existingNodeName = "10";
 
+        Grid _grid = new Grid();
+        GraphViewModel _gvm = new GraphViewModel();
+
         [StaFact]
         public void HistoryUndoAddTest()
-        {
-            Grid grid = new Grid();
-            GraphViewModel gvm = new GraphViewModel();
+        {           
             var model = TestHelper.MakeTestModel();
             int originalCount = model.Graph.Nodes.Count;
 
-            gvm.SetModel(grid, model);
-            gvm.AddNodeOrEdgeCommand.Execute(grid);
+            _gvm.SetModel(_grid, model);
+            _gvm.AddNodeOrEdgeCommand.Execute(_grid);
 
             Assert.Contains(model.Graph.Nodes, x => x.Name == newNodeName);
             Assert.Contains(model.NodeViews, x => x.Name.Text == newNodeName);
@@ -28,9 +29,9 @@ namespace GoGraphTests.ViewTests
             MethodInfo? selectNode = typeof(GraphViewModel).GetMethod("SelectNode", BindingFlags.NonPublic | BindingFlags.Instance);
             NodeView toSelect = model.NodeViews.First(x => x.Name.Text == existingNodeName);
 
-            selectNode?.Invoke(gvm, [toSelect]);
+            selectNode?.Invoke(_gvm, [toSelect]);
 
-            gvm.AddNodeOrEdgeCommand.Execute(grid);
+            _gvm.AddNodeOrEdgeCommand.Execute(_grid);
 
             Assert.Contains(model.Graph.Edges, x => IsEdgeBetweenNodes(x, existingNodeName, newNodeName));
             Assert.Contains(model.EdgesToViews.Keys, x => IsEdgeBetweenNodes(x, existingNodeName, newNodeName));
@@ -40,7 +41,7 @@ namespace GoGraphTests.ViewTests
 
             Assert.Contains(model.EdgeViews, x => x == ev);
 
-            gvm.UndoLastActionCommand.Execute(grid);
+            _gvm.UndoLastActionCommand.Execute(_grid);
 
             Assert.Contains(model.Graph.Nodes, x => x.Name == newNodeName);
             Assert.Contains(model.NodeViews, x => x.Name.Text == newNodeName);
@@ -48,7 +49,7 @@ namespace GoGraphTests.ViewTests
             Assert.DoesNotContain(model.EdgesToViews.Keys, x => IsEdgeBetweenNodes(x, existingNodeName, newNodeName));
             Assert.DoesNotContain(model.EdgeViews, x => x == ev);
 
-            gvm.UndoLastActionCommand.Execute(grid);
+            _gvm.UndoLastActionCommand.Execute(_grid);
 
             Assert.DoesNotContain(model.Graph.Nodes, x => x.Name == newNodeName);
             Assert.DoesNotContain(model.NodeViews, x => x.Name.Text == newNodeName);
@@ -57,29 +58,27 @@ namespace GoGraphTests.ViewTests
         [StaFact]
         public void HistoryUndoRemoveTest()
         {
-            Grid grid = new Grid();
-            GraphViewModel gvm = new GraphViewModel();
             var model = TestHelper.MakeTestModel();
             int originalCount = model.Graph.Nodes.Count;
 
-            gvm.SetModel(grid, model);
-            gvm.AddNodeOrEdgeCommand.Execute(grid);
+            _gvm.SetModel(_grid, model);
+            _gvm.AddNodeOrEdgeCommand.Execute(_grid);
 
             MethodInfo? selectNode = typeof(GraphViewModel).GetMethod("SelectNode", BindingFlags.NonPublic | BindingFlags.Instance);
             NodeView toSelect = model.NodeViews.First(x => x.Name.Text == existingNodeName);
-            selectNode?.Invoke(gvm, [toSelect]);
+            selectNode?.Invoke(_gvm, [toSelect]);
 
-            gvm.AddNodeOrEdgeCommand.Execute(grid);
+            _gvm.AddNodeOrEdgeCommand.Execute(_grid);
 
             MethodInfo? removeNode = typeof(GraphViewModel).GetMethod("RemoveNode", BindingFlags.NonPublic | BindingFlags.Instance);
-            removeNode.Invoke(gvm, [grid, model.NodeViews.First(x => x.Name.Text == newNodeName)]);
+            removeNode.Invoke(_gvm, [_grid, model.NodeViews.First(x => x.Name.Text == newNodeName)]);
 
             Assert.DoesNotContain(model.Graph.Nodes, x => x.Name == newNodeName);
             Assert.DoesNotContain(model.NodeViews, x => x.Name.Text == newNodeName);
             Assert.DoesNotContain(model.Graph.Edges, x => IsEdgeBetweenNodes(x, existingNodeName, newNodeName));
             Assert.DoesNotContain(model.EdgesToViews.Keys, x => IsEdgeBetweenNodes(x, existingNodeName, newNodeName));
 
-            gvm.UndoLastActionCommand.Execute(grid);
+            _gvm.UndoLastActionCommand.Execute(_grid);
 
             Assert.Contains(model.Graph.Nodes, x => x.Name == newNodeName);
             Assert.Contains(model.NodeViews, x => x.Name.Text == newNodeName);
