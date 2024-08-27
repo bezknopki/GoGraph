@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DialogWindow\DialogWindow.csproj" />
     <ProjectReference Include="..\GraphEngine\GraphEngine.csproj" />
   </ItemGroup>
 

@@ -1,5 +1,4 @@
 ﻿using DialogWindow.WeakEventHandler;
-using GoGraph.DialogWindows;
 using System.Windows;
 
 namespace DialogWindow

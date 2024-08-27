@@ -25,12 +25,8 @@
             <Grid Name="grid"  Background="LightCyan">
                 <Grid.InputBindings>
                     <MouseBinding MouseAction="LeftClick" Command="{Binding AddNodeOrEdgeCommand}" CommandParameter="{Binding ElementName=grid}"/>
+                    <MouseBinding MouseAction="RightClick" Command="{Binding RemoveCommand}" CommandParameter="{Binding ElementName=grid}"/>
                 </Grid.InputBindings>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseRightButtonDown">
-                        <i:InvokeCommandAction Command="{Binding RemoveCommand}" CommandParameter="{Binding ElementName=grid}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
             </Grid>
         </Border>
         <Menu Height ="20" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
@@ -40,7 +36,7 @@
                     <MenuItem Header="Weightened Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Weightened}"/>
                     <MenuItem Header="Directed Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Directed}"/>
                     <MenuItem Header="Directed Weightened Graph" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.DirectedWeightened}"/>
-                    <MenuItem Header="Web Graph (20x20)" Command="{Binding CreateGraphCommand}" CommandParameter="{x:Static gt:GraphTypes.Web}"/>
+                    <MenuItem Header="Web Graph" Command="{Binding CreateWebGraphCommand}" CommandParameter="{Binding ElementName=grid}"/>
                 </MenuItem>
                 <MenuItem Header="Open Project" Command="{Binding OpenCommand}" CommandParameter="{Binding ElementName=grid}"/>
                 <MenuItem Header="Save" IsEnabled="{Binding IsSaveAvailable, UpdateSourceTrigger=PropertyChanged}" Command="{Binding SaveCommand}"/>
@@ -54,7 +50,7 @@
         <TextBlock Text="Set Weight:" Grid.Row="1" Grid.Column="1" Margin="0 40 0 0" Height="20" VerticalAlignment="Top"/>
         <TextBox IsEnabled="{Binding IsWeightened, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                  Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Height="20" Margin="0 60 0 0"
-                 PreviewTextInput="NumberValidationTextBox"  Text="{Binding Weight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                 Text="{Binding Weight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         <Button Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Height="20" Margin="0 90 0 0" Command="{Binding BeginSearchCommand}"
                 CommandParameter="{Binding ElementName=grid}">Start</Button>
         <ListView Grid.Row="2" Grid.Column="0" ItemsSource="{Binding Results}"/>

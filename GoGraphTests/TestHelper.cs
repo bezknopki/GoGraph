@@ -66,5 +66,7 @@ namespace GoGraphTests
 
            return model;
         }
+
+        private static bool IsBetweenNodes(this Edge x, string n1, string n2) => (x.First.Name == n1 && x.Second.Name == n2) || (x.First.Name == n2 && x.Second.Name == n1);
     }
 }

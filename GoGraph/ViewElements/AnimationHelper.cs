@@ -98,21 +98,30 @@ namespace GoGraph.ViewElements
 
             double k = (end.Y - start.Y) / (end.X - start.X);
 
-            double walkX(double x) => start.X > end.X ? --x : ++x;
+            double hypotenuse = Math.Sqrt(Math.Pow(end.X - start.X, 2) + Math.Pow(end.Y - start.Y, 2));
+
             double offset = walker.Width / 2;
 
             Func<double, double, bool> isFinished = GetFinishCondition(mLeft, end.X);
 
-            while (isFinished(mLeft, end.X))
+            for (int i = 0; i < hypotenuse; i++)
             {
                 walker.Margin = new Thickness(mLeft - offset, mTop - offset, 0, 0);
 
-                mLeft = walkX(mLeft);
-                mTop = start.Y + (mLeft - start.X) * k;
+                if (Math.Round(end.X) != Math.Round(start.X))
+                {
+                    double xOffset = Math.Sqrt(Math.Pow(i, 2) / (Math.Pow(k, 2) + 1));
+                    mLeft = start.X + (start.X > end.X ? -xOffset : xOffset);
+                    double yOffset = k * xOffset;
+                    mTop = start.Y + yOffset;
+                }
+                else if (Math.Round(end.Y) != Math.Round(start.Y))
+                {
+                    mTop += start.Y > end.Y ? -1 : 1;
+                }
 
                 await Task.Delay(10);
             }
-            await Task.Delay(50);
         }
 
         private static async Task WalkByLine(Node from, Edge edge, Ellipse walker)
