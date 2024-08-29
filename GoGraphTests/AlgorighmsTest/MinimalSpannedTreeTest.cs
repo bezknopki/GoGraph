@@ -2,11 +2,6 @@
 using GoGraph.Serializer;
 using GraphEngine.Algorithms.MinimalSpannedTree;
 using GraphEngine.Graph.Edges;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GoGraphTests.AlgorighmsTest
 {

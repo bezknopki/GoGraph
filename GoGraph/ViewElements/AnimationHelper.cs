@@ -113,7 +113,7 @@ namespace GoGraph.ViewElements
                     double xOffset = Math.Sqrt(Math.Pow(i, 2) / (Math.Pow(k, 2) + 1));
                     mLeft = start.X + (start.X > end.X ? -xOffset : xOffset);
                     double yOffset = k * xOffset;
-                    mTop = start.Y + yOffset;
+                    mTop = start.Y + (start.X > end.X ? -yOffset : yOffset);
                 }
                 else if (Math.Round(end.Y) != Math.Round(start.Y))
                 {

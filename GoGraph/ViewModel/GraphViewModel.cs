@@ -264,10 +264,10 @@ namespace GoGraph.ViewModel
                         nodeMatrix[i][j].Next.Add(nodeMatrix[i - 1][j], new Edge { Weight = 1, IsWeightened = true });
 
                         if (j < rows - 1)
-                            nodeMatrix[i][j].Next.Add(nodeMatrix[i - 1][j + 1], new Edge { Weight = 1, IsWeightened = true });
+                            nodeMatrix[i][j].Next.Add(nodeMatrix[i - 1][j + 1], new Edge { Weight = Math.Sqrt(2), IsWeightened = true });
 
                         if (j > 0)
-                            nodeMatrix[i][j].Next.Add(nodeMatrix[i - 1][j - 1], new Edge { Weight = 1, IsWeightened = true });
+                            nodeMatrix[i][j].Next.Add(nodeMatrix[i - 1][j - 1], new Edge { Weight = Math.Sqrt(2), IsWeightened = true });
                     }
 
                     if (j > 0)
@@ -279,12 +279,12 @@ namespace GoGraph.ViewModel
                     if (i < cols - 1)
                     {
                         if (j > 0)
-                            nodeMatrix[i][j].Next.Add(nodeMatrix[i + 1][j - 1], new Edge { Weight = 1, IsWeightened = true });
+                            nodeMatrix[i][j].Next.Add(nodeMatrix[i + 1][j - 1], new Edge { Weight = Math.Sqrt(2), IsWeightened = true });
 
                         nodeMatrix[i][j].Next.Add(nodeMatrix[i + 1][j], new Edge { Weight = 1, IsWeightened = true });
 
                         if (j < rows - 1)
-                            nodeMatrix[i][j].Next.Add(nodeMatrix[i + 1][j + 1], new Edge { Weight = 1, IsWeightened = true });
+                            nodeMatrix[i][j].Next.Add(nodeMatrix[i + 1][j + 1], new Edge { Weight = Math.Sqrt(2), IsWeightened = true });
                     }
                 }
         }

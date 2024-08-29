@@ -37,7 +37,7 @@ namespace GraphEngine.Algorithms.InformedSearch
                 {
                     if (_closed.Contains(node)) continue;
 
-                    double newDst = _dstFromStart[cur] + 1;
+                    double newDst = _dstFromStart[cur] + cur.Next[node].Weight;
 
                     if (_open.Contains(node))
                     {
