@@ -1,7 +1,7 @@
 ﻿using GraphEngine.Graph.Edges;
 using GraphEngine.Graph.Nodes;
 
-namespace GraphEngine.Algorithms.MinimalSpannedTree
+namespace GraphEngine.GraphMath.MinimalSpannedTree
 {
     public class Prim : AlgorithmBase
     {

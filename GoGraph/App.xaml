@@ -6,14 +6,45 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <DataTemplate DataType="{x:Type vm:WebGraphSettingsViewModel}">
-            <Grid Width="200" Height="100">
-                <TextBlock Text="Set graph rows and columns count" Width="200" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                <TextBlock Margin="0 20 0 0" Text="Rows:" Width="50" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                <TextBox Margin="50 20 0 0" Width="50" Height="18" VerticalAlignment="Top" HorizontalAlignment="Left" Text="{Binding Rows}"/>
-                <TextBlock Margin="0 40 0 0" Text="Columns:" Width="50" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                <TextBox Margin="50 40 0 0" Width="50" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Text="{Binding Columns}"/>
-                <Button Margin="30 70 0 0" Width="50" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="OK" Command="{Binding OkCommand}"/>
-                <Button Margin="90 70 0 0" Width="50" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Content="Cancel" Command="{Binding CancelCommand}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="5" Grid.Row="0" Grid.ColumnSpan="2" Text="Set graph rows and columns count" Height="20"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="Rows:" Height="20"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Height="20" Text="{Binding Rows}"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="Columns:" Height="20"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Height="20" Text="{Binding Columns}"/>
+                <Button Grid.Row="3" Grid.Column="0" Margin="5" Height="20" Content="OK" Command="{Binding OkCommand}"/>
+                <Button Grid.Row="3" Grid.Column="1" Margin="5" Height="20" Content="Cancel" Command="{Binding CancelCommand}"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ExecuteSettingsViewModel}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="5" Grid.Row="0" Grid.ColumnSpan="2" Text="Select root and goal nodes" Height="20"/>
+                <TextBlock Visibility="{Binding RootNodeChoiceVisibility}" Grid.Row="1" Grid.Column="0" Margin="5" Text="Root:" Height="20"/>
+                <TextBox Visibility="{Binding RootNodeChoiceVisibility}" Grid.Row="1" Grid.Column="1" Margin="5" Height="20" Text="{Binding RootNodeName}"/>
+                <TextBlock Visibility="{Binding GoalNodeChoiceVisibility}" Grid.Row="2" Grid.Column="0" Margin="5" Text="Goal:" Height="20"/>
+                <TextBox Visibility="{Binding GoalNodeChoiceVisibility}" Grid.Row="2" Grid.Column="1" Margin="5" Height="20" Text="{Binding GoalNodeName}"/>
+                <Button Grid.Row="3" Grid.Column="0" Margin="5" Height="20" Content="OK" Command="{Binding OkCommand}"/>
+                <Button Grid.Row="3" Grid.Column="1" Margin="5" Height="20" Content="Cancel" Command="{Binding CancelCommand}"/>
             </Grid>
         </DataTemplate>
     </Application.Resources>

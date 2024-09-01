@@ -1,7 +1,7 @@
 ﻿using GraphEngine.Graph.Edges;
 using GraphEngine.Graph.Nodes;
 
-namespace GraphEngine.Algorithms.UninformedSearch
+namespace GraphEngine.GraphMath.UninformedSearch
 {
     public class DepthFirstSearch : AlgorithmBase
     {

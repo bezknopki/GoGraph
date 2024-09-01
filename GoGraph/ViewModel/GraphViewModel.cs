@@ -14,9 +14,11 @@ using GraphEngine.Graph.Graphs.GraphCreator;
 using GoGraph.Serializer;
 using GoGraph.History;
 using System.Collections.ObjectModel;
-using GraphEngine.Algorithms.InformedSearch;
+using GraphEngine.GraphMath.InformedSearch;
 using System.Windows.Shapes;
 using DialogWindow;
+using GraphEngine.GraphMath;
+using GraphEngine.GraphMath.ShortestWay;
 
 namespace GoGraph.ViewModel
 {
@@ -32,7 +34,7 @@ namespace GoGraph.ViewModel
         private RelayCommand _openCommand;
         private RelayCommand _saveCommand;
         private RelayCommand _saveAsCommand;
-        private RelayCommand _beginSearchCommand;
+        private RelayCommand _executeCommand;
         private RelayCommand _undoLastActionCommand;
         private RelayCommand _removeCommand;
 
@@ -43,6 +45,7 @@ namespace GoGraph.ViewModel
         private List<Direction> _directions = new List<Direction> { Direction.FirstToSecond, Direction.SecondToFirst, Direction.Both };
 
         private Direction _selectedDirection = Direction.FirstToSecond;
+        private Algorithms _selectedAlgorithm = Algorithms.Prim;
 
         private string _weight = "0";
         private string _savePath = string.Empty;
@@ -53,6 +56,8 @@ namespace GoGraph.ViewModel
         public GraphViewModel()
         {
             HistoryManager.Model = _model;
+            foreach (var a in Enum.GetValues(typeof(Algorithms)))
+                AvailableAlgorithms.Add((Algorithms)a);
         }
 
         public List<Direction> Directions => _directions;
@@ -62,6 +67,7 @@ namespace GoGraph.ViewModel
         public bool IsSaveAvailable => !string.IsNullOrEmpty(_savePath);
         public bool IsSaveAsAvailable => _model.Graph != null;
         public ObservableCollection<string> Results { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<Algorithms> AvailableAlgorithms { get; set; } = new ObservableCollection<Algorithms>();
 
         public string Weight
         {
@@ -80,6 +86,16 @@ namespace GoGraph.ViewModel
             {
                 _selectedDirection = value;
                 OnPropertyChanged(nameof(SelectedDirection));
+            }
+        }
+
+        public Algorithms SelectedAlgorithm
+        {
+            get => _selectedAlgorithm;
+            set
+            {
+                _selectedAlgorithm = value;
+                OnPropertyChanged(nameof(SelectedAlgorithm));
             }
         }
 
@@ -114,10 +130,10 @@ namespace GoGraph.ViewModel
             set { _undoLastActionCommand = value; }
         }
 
-        public RelayCommand BeginSearchCommand
+        public RelayCommand ExecuteCommand
         {
-            get => _beginSearchCommand ??= new RelayCommand(obj => BeginSearch(obj), obj => obj is Grid);
-            set { _beginSearchCommand = value; }
+            get => _executeCommand ??= new RelayCommand(obj => ExecuteAlgorithm(obj), obj => obj is Grid);
+            set { _executeCommand = value; }
         }
 
         public RelayCommand SaveCommand
@@ -176,7 +192,7 @@ namespace GoGraph.ViewModel
                 grid.Children.Add(view.Name);
             }
 
-            NodeNameSequence.SetStart(model.Graph.Nodes.Max(x => int.Parse(x.Name)));
+            NodeNameSequence.SetStart(model.Graph.Nodes.Max(x => x.Id));
             HistoryManager.Model = model;
         }
 
@@ -228,7 +244,7 @@ namespace GoGraph.ViewModel
                     Grid.SetColumn(border, i);
                     Grid.SetRow(border, j);
 
-                    nodeMatrix[i][j] = new WebNode { Name = NodeNameSequence.Next.ToString(), X = i, Y = j };
+                    nodeMatrix[i][j] = new WebNode { Id = NodeNameSequence.Next, X = i, Y = j };
                     _model.Graph.Nodes.Add(nodeMatrix[i][j]);
                     _model.NodesToViews.Add(nodeMatrix[i][j], border);
                 }
@@ -404,7 +420,7 @@ namespace GoGraph.ViewModel
         {
             grid.Children.Remove(nodeView.Node);
             grid.Children.Remove(nodeView.Name);
-            Node associatedNode = _model.Graph.Nodes.First(x => x.Name == nodeView.Name.Text);
+            Node associatedNode = _model.Graph.Nodes.First(x => x.Id.ToString() == nodeView.Name.Text);
             foreach (var node in _model.Graph.Nodes)
                 if (node.Next.ContainsKey(associatedNode))
                     node.Next.Remove(associatedNode);
@@ -451,39 +467,65 @@ namespace GoGraph.ViewModel
             HistoryManager.Push(ActionType.Remove, associatedEdge, edgeView.Edge, edgeView, edgeView.Arrows, edgeView.Weight);
         }
 
-        private async void BeginSearch(object obj)
+        private async void ExecuteAlgorithm(object obj)
         {
-            var result = _uiDialogService.ShowDialog("Dialogwindow Title", new WebGraphSettingsViewModel());
+            AlgorithmsFacade algorithmsFacade = new AlgorithmsFacade();
+            switch (SelectedAlgorithm)
+            {
+                case Algorithms.Dijkstra:
+                    {
+                        ExecuteSettingsViewModel esvm = new ExecuteSettingsViewModel(true, true);
+                        if (_uiDialogService.ShowDialog("Dijkstra Settings", esvm).Value)
+                        {
+                            Node root = _model.Graph.Nodes.First(x => x.Id == esvm.RootNodeName);
+                            Node goal = _model.Graph.Nodes.First(x => x.Id == esvm.GoalNodeName);
+                            Way res = algorithmsFacade.FindShortestWayDijkstra(_model.Graph, root, goal);
+                            Results.Add(res.ToString()); 
+                            await AnimationHelper.WalkThrough(res);
+                        }
+                        break;
+                    }
+                case Algorithms.Prim:
+                    {
+                        ExecuteSettingsViewModel esvm = new ExecuteSettingsViewModel(true, false);
 
-            //AnimationHelper.Model = _model;
-            //AnimationHelper.Grid = (Grid)obj;
-            //Prim bfs = new();
-            //AStar astar = new AStar();
+                        if (_uiDialogService.ShowDialog("Dijkstra Settings", esvm).Value)
+                        {
+                            Node root = _model.Graph.Nodes.First(x => x.Id == esvm.RootNodeName);
+                            List<Edge> tree = algorithmsFacade.MSTPrim(root);
+                            Results.Add(string.Join("\n", tree.Select(x => $"{x.First.Id} - {x.Second.Id} Weight: {x.Weight}").Union([$"Sum: {tree.Sum(x => x.Weight)}"])));
+                        }
+                        break;
+                    }
+                case Algorithms.BreadthFirstSearch:
+                    {
+                        ExecuteSettingsViewModel esvm = new ExecuteSettingsViewModel(true, false);
 
-            //var res = astar.Start(_from, _dst);
-            //foreach (var item in res)
-            //{
-            //    _model.NodesToViews[item].Background = Brushes.ForestGreen;
-            //}
+                        if (_uiDialogService.ShowDialog("Dijkstra Settings", esvm).Value)
+                        {
+                            Node root = _model.Graph.Nodes.First(x => x.Id == esvm.RootNodeName);
+                            LinkedList<Node> nodes = await algorithmsFacade.BreadthFirstSearch(root);
+                            Results.Add(string.Join(" -> ", nodes.Select(x => x.Id)));
+                        }
+                        break;
+                    }
+                case Algorithms.DepthFirstSearch:
+                    {
+                        ExecuteSettingsViewModel esvm = new ExecuteSettingsViewModel(true, false);
 
-            //bfs.HighlightNodeEvent += AnimationHelper.HighlightNode;
-            //bfs.HighlightEdgeEvent += AnimationHelper.HighlightEdge;
-
-            //string res = await bfs.Start(_model.Graph.Nodes.First());
-            //MessageBox.Show(res);
-
-            //var res = bfs.Start(_model.Graph.Nodes.First(), _model.Graph.Nodes.Count);
-            //foreach (var e in _model.Graph.Edges)
-            //{
-            //    if (!res.Contains(e))
-            //    {
-            //        _model.EdgesToViews[e].Edge.Opacity = 0.3;
-            //        _model.EdgesToViews[e].Weight.Opacity = 0.3;
-            //    }
-            //}
-            //await AnimationHelper.WalkThrough(w);
-            //AnimationHelper.Reset();
-            //Results.Add(w.ToString());
+                        if (_uiDialogService.ShowDialog("Dijkstra Settings", esvm).Value)
+                        {
+                            Node root = _model.Graph.Nodes.First(x => x.Id == esvm.RootNodeName);
+                            LinkedList<Node> nodes = await algorithmsFacade.DepthFirstSearch(root);
+                            Results.Add(string.Join(" -> ", nodes.Select(x => x.Id)));
+                        }
+                        break;
+                    }
+                case Algorithms.ASTar:
+                    {
+                        break;
+                    }
+            }
         }
 
         private void SaveAsProjectCommand()
@@ -647,10 +689,10 @@ namespace GoGraph.ViewModel
         {
             Point curPos = Mouse.GetPosition(grid);
 
-            string name = NodeNameSequence.Next.ToString();
+            int id = NodeNameSequence.Next;
             NodeViewBuilder builder = new NodeViewBuilder();
             builder.SetPosition(curPos)
-                   .SetName(name);
+                   .SetName(id.ToString());
 
             var view = builder.Build();
 
@@ -658,7 +700,7 @@ namespace GoGraph.ViewModel
             grid.Children.Add(view.Name);
             Node newNode = new Node
             {
-                Name = name
+                Id = id
             };
 
             HistoryManager.Push(ActionType.Add, newNode, view, view.Node, view.Name);
@@ -703,7 +745,7 @@ namespace GoGraph.ViewModel
             else _secondSelected = null;
         }
 
-        private Node GetNodeByView(NodeView view) => _model.Graph?.Nodes.First(x => x.Name == view.Name.Text);
+        private Node GetNodeByView(NodeView view) => _model.Graph?.Nodes.First(x => x.Id.ToString() == view.Name.Text);
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));

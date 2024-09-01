@@ -1,7 +1,7 @@
 ﻿using GraphEngine.Graph.Edges;
 using GraphEngine.Graph.Nodes;
 
-namespace GraphEngine.Algorithms
+namespace GraphEngine.GraphMath
 {
     public abstract class AlgorithmBase
     {

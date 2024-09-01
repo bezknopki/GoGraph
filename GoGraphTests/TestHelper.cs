@@ -22,7 +22,7 @@ namespace GoGraphTests
             {
                 Node node = new Node
                 {
-                    Name = i.ToString()
+                    Id = i
                 };
 
                 NodeViewBuilder nvb = new NodeViewBuilder();
@@ -67,6 +67,6 @@ namespace GoGraphTests
            return model;
         }
 
-        private static bool IsBetweenNodes(this Edge x, string n1, string n2) => (x.First.Name == n1 && x.Second.Name == n2) || (x.First.Name == n2 && x.Second.Name == n1);
+        public static bool IsBetweenNodes(this Edge x, int n1, int n2) => (x.First.Id == n1 && x.Second.Id == n2) || (x.First.Id == n2 && x.Second.Id == n1);
     }
 }

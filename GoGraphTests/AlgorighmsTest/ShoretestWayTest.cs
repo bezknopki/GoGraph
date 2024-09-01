@@ -1,6 +1,6 @@
 ﻿using GoGraph.Serializer;
 using GoGraph.Model;
-using GraphEngine.Algorithms.ShortestWay;
+using GraphEngine.GraphMath.ShortestWay;
 using GraphEngine.Graph.Nodes;
 
 namespace GoGraphTests.AlgorighmsTest
@@ -14,8 +14,8 @@ namespace GoGraphTests.AlgorighmsTest
             GraphModel model = ProjectSerializer.DeserializeXML(path);
             Dijkstra dijkstra = new Dijkstra();
 
-            Node from = model.Graph.Nodes.First(x => x.Name == "1");
-            Node to = model.Graph.Nodes.First(x => x.Name == "5");
+            Node from = model.Graph.Nodes.First(x => x.Id == 1);
+            Node to = model.Graph.Nodes.First(x => x.Id == 5);
 
             Way way = dijkstra.FindShortestWay(model.Graph, from, to);
 

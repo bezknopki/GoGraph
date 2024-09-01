@@ -1,6 +1,6 @@
 ﻿using GraphEngine.Graph.Nodes;
 
-namespace GraphEngine.Algorithms.InformedSearch
+namespace GraphEngine.GraphMath.InformedSearch
 {
     public class AStar
     {

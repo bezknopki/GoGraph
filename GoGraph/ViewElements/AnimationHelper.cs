@@ -1,4 +1,4 @@
-﻿using GraphEngine.Algorithms.ShortestWay;
+﻿using GraphEngine.GraphMath.ShortestWay;
 using GraphEngine.Graph.Edges;
 using GraphEngine.Graph.Nodes;
 using GoGraph.Model;
@@ -157,6 +157,6 @@ namespace GoGraph.ViewElements
             _markViews.Clear();
         }
 
-        private static NodeView GetNodeViewByNode(Node node) => Model.NodeViews.First(x => x.Name.Text == node.Name);
+        private static NodeView GetNodeViewByNode(Node node) => Model.NodeViews.First(x => x.Name.Text == node.Id.ToString());
     }
 }

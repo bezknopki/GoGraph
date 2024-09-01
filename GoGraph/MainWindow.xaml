@@ -43,17 +43,37 @@
                 <MenuItem Header="Save As..." IsEnabled="{Binding IsSaveAsAvailable, UpdateSourceTrigger=PropertyChanged}" Command="{Binding SaveAsCommand}"/>
             </MenuItem>
         </Menu>
-        <TextBlock Text="Choose edge direction:" Grid.Row="1" Grid.Column="1" Height="20" VerticalAlignment="Top"/>
-        <ComboBox ItemsSource="{Binding Directions}" SelectedItem="{Binding SelectedDirection}" Grid.Row="1" Grid.Column="1" Height="20" 
-                  VerticalAlignment="Top" IsEnabled="{Binding IsDirected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                  Margin="0 20 0 0"/>
-        <TextBlock Text="Set Weight:" Grid.Row="1" Grid.Column="1" Margin="0 40 0 0" Height="20" VerticalAlignment="Top"/>
-        <TextBox IsEnabled="{Binding IsWeightened, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                 Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Height="20" Margin="0 60 0 0"
-                 Text="{Binding Weight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <Button Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Height="20" Margin="0 90 0 0" Command="{Binding BeginSearchCommand}"
-                CommandParameter="{Binding ElementName=grid}">Start</Button>
-        <ListView Grid.Row="2" Grid.Column="0" ItemsSource="{Binding Results}"/>
+        <Grid Grid.Row="1" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="90"></RowDefinition>
+                <RowDefinition Height="90"></RowDefinition>
+                <RowDefinition Height="120"></RowDefinition>
 
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <GroupBox Header="Direction" Grid.Row="0" >
+                <StackPanel>
+                    <TextBlock Margin="5" Text="Choose edge direction:" Height="20"/>
+                    <ComboBox Margin="5" ItemsSource="{Binding Directions}" SelectedItem="{Binding SelectedDirection}" Height="20" 
+                    IsEnabled="{Binding IsDirected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Weight" Grid.Row="1">
+                <StackPanel>
+                    <TextBlock Margin="5" Text="Set Weight:" Height="20"/>
+                    <TextBox Margin="5" IsEnabled="{Binding IsWeightened, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                    Height="20" Text="{Binding Weight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Algorithms" Grid.Row="2" >
+                <StackPanel>
+                    <TextBlock Text="Select algorithm:" Margin="5" Height="20"/>
+                    <ComboBox ItemsSource="{Binding AvailableAlgorithms}" Margin="5" SelectedItem="{Binding SelectedAlgorithm}" Height="20"/>
+                    <Button Height="20" Margin="5" Command="{Binding ExecuteCommand}"
+                    CommandParameter="{Binding ElementName=grid}" Content="Execute"/>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+        <ListView Grid.Row="2" Grid.Column="0" ItemsSource="{Binding Results}"/>
     </Grid>
 </Window>

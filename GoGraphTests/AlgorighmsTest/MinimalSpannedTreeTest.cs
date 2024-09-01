@@ -1,6 +1,6 @@
 ﻿using GoGraph.Model;
 using GoGraph.Serializer;
-using GraphEngine.Algorithms.MinimalSpannedTree;
+using GraphEngine.GraphMath.MinimalSpannedTree;
 using GraphEngine.Graph.Edges;
 
 namespace GoGraphTests.AlgorighmsTest
@@ -17,12 +17,12 @@ namespace GoGraphTests.AlgorighmsTest
             List<Edge> result = prim.Start(model.Graph.Nodes.First(), model.Graph.Nodes.Count);
 
             Assert.Equal(model.Graph.Nodes.Count - 1, result.Count);
-            Assert.Contains(result, x => (x.First.Name == "1" && x.Second.Name == "2") || (x.First.Name == "2" && x.Second.Name == "1"));
-            Assert.Contains(result, x => (x.First.Name == "1" && x.Second.Name == "4") || (x.First.Name == "4" && x.Second.Name == "1"));
-            Assert.Contains(result, x => (x.First.Name == "2" && x.Second.Name == "5") || (x.First.Name == "5" && x.Second.Name == "2"));
-            Assert.Contains(result, x => (x.First.Name == "4" && x.Second.Name == "6") || (x.First.Name == "6" && x.Second.Name == "4"));
-            Assert.Contains(result, x => (x.First.Name == "5" && x.Second.Name == "7") || (x.First.Name == "7" && x.Second.Name == "5"));
-            Assert.Contains(result, x => (x.First.Name == "3" && x.Second.Name == "5") || (x.First.Name == "5" && x.Second.Name == "3"));
+            Assert.Contains(result, x => x.IsBetweenNodes(1, 2));
+            Assert.Contains(result, x => x.IsBetweenNodes(1, 4));
+            Assert.Contains(result, x => x.IsBetweenNodes(2, 5));
+            Assert.Contains(result, x => x.IsBetweenNodes(4, 6));
+            Assert.Contains(result, x => x.IsBetweenNodes(5, 7));
+            Assert.Contains(result, x => x.IsBetweenNodes(3, 5));
         }
     }
 }

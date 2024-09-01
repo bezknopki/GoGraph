@@ -50,7 +50,7 @@ namespace GoGraph.Serializer
             foreach (var sNode in Nodes)
             {
                 Node node = new Node();
-                node.Name = sNode.Name;
+                node.Id = sNode.Id;
                 nodes.Add(node);
             }
            
@@ -61,15 +61,15 @@ namespace GoGraph.Serializer
             GraphBase graph = new SimpleGraphCreator().Create(GraphType);
             
             graph.Edges = Edges.Select(x => x.ToEdge(
-                    nodes.First(v => v.Name == x.First.Name),
-                    nodes.First(v => v.Name == x.Second.Name)))
+                    nodes.First(v => v.Id == x.First.Id),
+                    nodes.First(v => v.Id == x.Second.Id)))
                 .ToList();
 
             foreach (var node in nodes)
             {
-                SNode sNode = Nodes.First(x => x.Name == node.Name);
+                SNode sNode = Nodes.First(x => x.Id == node.Id);
                 foreach (var nextNode in nodes)
-                    if (sNode.Next.Contains(nextNode.Name))
+                    if (sNode.Next.Contains(nextNode.Id))
                         node.Next.Add(nextNode, GetEdgeBetweenNodes(graph, node, nextNode));
             }
 
@@ -82,7 +82,7 @@ namespace GoGraph.Serializer
                 Edge edge;
                 EdgeView edgeView;
 
-                edge = graph.Edges.First(x => x.First.Name == etv.Item1.First.Name && x.Second.Name == etv.Item1.Second.Name);
+                edge = graph.Edges.First(x => x.First.Id == etv.Item1.First.Id && x.Second.Id == etv.Item1.Second.Id);
                 edgeView = edgeViews.First(x => x.Edge.X1 == etv.Item2.P1.X 
                 && x.Edge.Y1 == etv.Item2.P1.Y
                 && x.Edge.X2 == etv.Item2.P2.X

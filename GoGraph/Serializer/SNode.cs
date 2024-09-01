@@ -5,16 +5,16 @@ namespace GoGraph.Serializer
     [Serializable]
     public class SNode
     {
-        public string Name { get; set; }
-        public HashSet<string> Next { get; set; } = new HashSet<string>();
+        public int Id { get; set; }
+        public HashSet<int> Next { get; set; } = new HashSet<int>();
 
         public SNode() { }
 
         public SNode(Node node)
         {
-            Name = node.Name;
+            Id = node.Id;
             foreach (var next in node.Next.Keys)
-                Next.Add(next.Name);
+                Next.Add(next.Id);
         }       
     }
 }

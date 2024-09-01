@@ -35,10 +35,10 @@ namespace GoGraphTests.SerializerTest
                 Node deser = deserializedModel.Graph.Nodes[i];
 
                 Assert.NotNull(deser);
-                Assert.Equal(orig.Name, deser.Name);
+                Assert.Equal(orig.Id, deser.Id);
 
                 foreach (var next in deser.Next.Keys)
-                    Assert.Contains(orig.Next.Keys, x => x.Name == next.Name);
+                    Assert.Contains(orig.Next.Keys, x => x.Id == next.Id);
             }
 
             for (int i = 0; i < model.Graph.Edges.Count; i++)
@@ -49,8 +49,8 @@ namespace GoGraphTests.SerializerTest
                 Assert.NotNull(deser);
                 Assert.Equal(orig.Weight, deser.Weight);
                 Assert.Equal(orig.IsWeightened, deser.IsWeightened);
-                Assert.Equal(orig.First.Name, deser.First.Name);
-                Assert.Equal(orig.Second.Name, deser.Second.Name);
+                Assert.Equal(orig.First.Id, deser.First.Id);
+                Assert.Equal(orig.Second.Id, deser.Second.Id);
                 Assert.Equal(orig.Direction, deser.Direction);
                 Assert.Equal(orig.IsDirected, deser.IsDirected);
             }

@@ -1,6 +1,6 @@
 ﻿using GraphEngine.Graph.Nodes;
 
-namespace GraphEngine.Algorithms.ShortestWay
+namespace GraphEngine.GraphMath.ShortestWay
 {
     public abstract class ShortestWay : AlgorithmBase
     {

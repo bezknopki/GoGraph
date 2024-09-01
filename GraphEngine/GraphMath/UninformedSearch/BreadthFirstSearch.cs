@@ -1,6 +1,6 @@
 ﻿using GraphEngine.Graph.Nodes;
 
-namespace GraphEngine.Algorithms.UninformedSearch
+namespace GraphEngine.GraphMath.UninformedSearch
 {
     public class BreadthFirstSearch : AlgorithmBase
     {

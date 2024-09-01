@@ -2,7 +2,7 @@
 using GraphEngine.Graph.Nodes;
 using System.Text;
 
-namespace GraphEngine.Algorithms.ShortestWay
+namespace GraphEngine.GraphMath.ShortestWay
 {
     public class Way
     {
@@ -22,10 +22,10 @@ namespace GraphEngine.Algorithms.ShortestWay
             StringBuilder sb = new StringBuilder();
             foreach (Edge e in Edges)
             {
-                sb.Append($"{f.Name} -> ");
+                sb.Append($"{f.Id} -> ");
                 f = f == e.First ? e.Second : e.First;               
             }
-            sb.Append(To.Name);
+            sb.Append(To.Id);
             sb.Append($" Length: {Edges.Sum(x => x.Weight)}");
             return sb.ToString();
         }

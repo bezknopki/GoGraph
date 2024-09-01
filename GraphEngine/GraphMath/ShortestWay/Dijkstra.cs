@@ -1,7 +1,7 @@
 ﻿using GraphEngine.Graph.Graphs;
 using GraphEngine.Graph.Nodes;
 
-namespace GraphEngine.Algorithms.ShortestWay
+namespace GraphEngine.GraphMath.ShortestWay
 {
     public class Dijkstra : ShortestWay
     {
